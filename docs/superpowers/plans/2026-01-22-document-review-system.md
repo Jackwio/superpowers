@@ -1,27 +1,27 @@
-# Document Review System Implementation Plan
+# 文件審查系統實作計畫
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan.
 
-**Goal:** Add spec and plan document review loops to the brainstorming and writing-plans skills.
+**目標：**在 brainstorming 與 writing-plans 技能中加入規格與計畫文件的審查迴圈。
 
-**Architecture:** Create reviewer prompt templates in each skill directory. Modify skill files to add review loops after document creation. Use Task tool with general-purpose subagent for reviewer dispatch.
+**架構：**在各技能目錄建立審查者提示範本。修改技能檔案，在文件建立後加入審查迴圈。使用 Task 工具搭配 general-purpose 子代理派發審查者。
 
-**Tech Stack:** Markdown skill files, subagent dispatch via Task tool
+**技術棧：**Markdown 技能檔案、透過 Task 工具派發子代理
 
-**Spec:** docs/superpowers/specs/2026-01-22-document-review-system-design.md
+**規格：**docs/superpowers/specs/2026-01-22-document-review-system-design.md
 
 ---
 
-## Chunk 1: Spec Document Reviewer
+## 區塊 1：規格文件審查者
 
-This chunk adds the spec document reviewer to the brainstorming skill.
+此區塊將規格文件審查者加入 brainstorming 技能。
 
-### Task 1: Create Spec Document Reviewer Prompt Template
+### 任務 1：建立規格文件審查者提示範本
 
-**Files:**
-- Create: `skills/brainstorming/spec-document-reviewer-prompt.md`
+**檔案：**
+- 新增：`skills/brainstorming/spec-document-reviewer-prompt.md`
 
-- [ ] **Step 1:** Create the reviewer prompt template file
+- [ ] **步驟 1：**建立審查者提示範本檔案
 
 ```markdown
 # Spec Document Reviewer Prompt Template
@@ -73,12 +73,12 @@ Task tool (general-purpose):
 **Reviewer returns:** Status, Issues (if any), Recommendations
 ```
 
-- [ ] **Step 2:** Verify the file was created correctly
+- [ ] **步驟 2：**驗證檔案建立正確
 
-Run: `cat skills/brainstorming/spec-document-reviewer-prompt.md | head -20`
-Expected: Shows the header and purpose section
+執行：`cat skills/brainstorming/spec-document-reviewer-prompt.md | head -20`
+預期：顯示標題與目的區段
 
-- [ ] **Step 3:** Commit
+- [ ] **步驟 3：**提交
 
 ```bash
 git add skills/brainstorming/spec-document-reviewer-prompt.md
@@ -87,18 +87,18 @@ git commit -m "feat: add spec document reviewer prompt template"
 
 ---
 
-### Task 2: Add Review Loop to Brainstorming Skill
+### 任務 2：在 Brainstorming 技能加入審查迴圈
 
-**Files:**
-- Modify: `skills/brainstorming/SKILL.md`
+**檔案：**
+- 修改：`skills/brainstorming/SKILL.md`
 
-- [ ] **Step 1:** Read the current brainstorming skill
+- [ ] **步驟 1：**閱讀目前的 brainstorming 技能
 
-Run: `cat skills/brainstorming/SKILL.md`
+執行：`cat skills/brainstorming/SKILL.md`
 
-- [ ] **Step 2:** Add the review loop section after "After the Design"
+- [ ] **步驟 2：**在「After the Design」後加入審查迴圈
 
-Find the "After the Design" section and add a new "Spec Review Loop" section after documentation but before implementation:
+找到「After the Design」段落，於文件區塊之後、實作之前新增「Spec Review Loop」：
 
 ```markdown
 **Spec Review Loop:**
@@ -116,12 +116,12 @@ After writing the spec document:
 - Reviewers are advisory - explain disagreements if you believe feedback is incorrect
 ```
 
-- [ ] **Step 3:** Verify the changes
+- [ ] **步驟 3：**驗證變更
 
-Run: `grep -A 15 "Spec Review Loop" skills/brainstorming/SKILL.md`
-Expected: Shows the new review loop section
+執行：`grep -A 15 "Spec Review Loop" skills/brainstorming/SKILL.md`
+預期：顯示新的審查迴圈區段
 
-- [ ] **Step 4:** Commit
+- [ ] **步驟 4：**提交
 
 ```bash
 git add skills/brainstorming/SKILL.md
@@ -130,16 +130,16 @@ git commit -m "feat: add spec review loop to brainstorming skill"
 
 ---
 
-## Chunk 2: Plan Document Reviewer
+## 區塊 2：計畫文件審查者
 
-This chunk adds the plan document reviewer to the writing-plans skill.
+此區塊將計畫文件審查者加入 writing-plans 技能。
 
-### Task 3: Create Plan Document Reviewer Prompt Template
+### 任務 3：建立計畫文件審查者提示範本
 
-**Files:**
-- Create: `skills/writing-plans/plan-document-reviewer-prompt.md`
+**檔案：**
+- 新增：`skills/writing-plans/plan-document-reviewer-prompt.md`
 
-- [ ] **Step 1:** Create the reviewer prompt template file
+- [ ] **步驟 1：**建立審查者提示範本檔案
 
 ```markdown
 # Plan Document Reviewer Prompt Template
@@ -193,12 +193,12 @@ Task tool (general-purpose):
 **Reviewer returns:** Status, Issues (if any), Recommendations
 ```
 
-- [ ] **Step 2:** Verify the file was created
+- [ ] **步驟 2：**驗證檔案建立
 
-Run: `cat skills/writing-plans/plan-document-reviewer-prompt.md | head -20`
-Expected: Shows the header and purpose section
+執行：`cat skills/writing-plans/plan-document-reviewer-prompt.md | head -20`
+預期：顯示標題與目的區段
 
-- [ ] **Step 3:** Commit
+- [ ] **步驟 3：**提交
 
 ```bash
 git add skills/writing-plans/plan-document-reviewer-prompt.md
@@ -207,18 +207,18 @@ git commit -m "feat: add plan document reviewer prompt template"
 
 ---
 
-### Task 4: Add Review Loop to Writing-Plans Skill
+### 任務 4：在 Writing-Plans 技能加入審查迴圈
 
-**Files:**
-- Modify: `skills/writing-plans/SKILL.md`
+**檔案：**
+- 修改：`skills/writing-plans/SKILL.md`
 
-- [ ] **Step 1:** Read current skill file
+- [ ] **步驟 1：**閱讀目前技能檔案
 
-Run: `cat skills/writing-plans/SKILL.md`
+執行：`cat skills/writing-plans/SKILL.md`
 
-- [ ] **Step 2:** Add chunk-by-chunk review section
+- [ ] **步驟 2：**加入逐區塊審查段落
 
-Add before the "Execution Handoff" section:
+在「Execution Handoff」之前加入：
 
 ```markdown
 ## Plan Review Loop
@@ -236,9 +236,9 @@ After completing each chunk of the plan:
 **Chunk boundaries:** Use `## Chunk N: <name>` headings to delimit chunks. Each chunk should be ≤1000 lines and logically self-contained.
 ```
 
-- [ ] **Step 3:** Update task syntax examples to use checkboxes
+- [ ] **步驟 3：**更新任務語法範例為勾選框
 
-Change the Task Structure section to show checkbox syntax:
+將 Task Structure 區段改為勾選框語法：
 
 ```markdown
 ### Task N: [Component Name]
@@ -248,17 +248,17 @@ Change the Task Structure section to show checkbox syntax:
   ...
 ```
 
-- [ ] **Step 4:** Verify the review loop section was added
+- [ ] **步驟 4：**驗證已加入審查迴圈段落
 
-Run: `grep -A 15 "Plan Review Loop" skills/writing-plans/SKILL.md`
-Expected: Shows the new review loop section
+執行：`grep -A 15 "Plan Review Loop" skills/writing-plans/SKILL.md`
+預期：顯示新的審查迴圈段落
 
-- [ ] **Step 5:** Verify the task syntax examples were updated
+- [ ] **步驟 5：**驗證任務語法範例已更新
 
-Run: `grep -A 5 "Task N:" skills/writing-plans/SKILL.md`
-Expected: Shows checkbox syntax `### Task N:`
+執行：`grep -A 5 "Task N:" skills/writing-plans/SKILL.md`
+預期：顯示勾選框語法 `### Task N:`
 
-- [ ] **Step 6:** Commit
+- [ ] **步驟 6：**提交
 
 ```bash
 git add skills/writing-plans/SKILL.md
@@ -267,33 +267,33 @@ git commit -m "feat: add plan review loop and checkbox syntax to writing-plans s
 
 ---
 
-## Chunk 3: Update Plan Document Header
+## 區塊 3：更新計畫文件標頭
 
-This chunk updates the plan document header template to reference the new checkbox syntax requirements.
+此區塊更新計畫文件標頭範本，以提及新的勾選框語法需求。
 
-### Task 5: Update Plan Header Template in Writing-Plans Skill
+### 任務 5：更新 Writing-Plans 技能中的計畫標頭範本
 
-**Files:**
-- Modify: `skills/writing-plans/SKILL.md`
+**檔案：**
+- 修改：`skills/writing-plans/SKILL.md`
 
-- [ ] **Step 1:** Read current plan header template
+- [ ] **步驟 1：**讀取目前的計畫標頭範本
 
-Run: `grep -A 20 "Plan Document Header" skills/writing-plans/SKILL.md`
+執行：`grep -A 20 "Plan Document Header" skills/writing-plans/SKILL.md`
 
-- [ ] **Step 2:** Update the header template to reference checkbox syntax
+- [ ] **步驟 2：**更新標頭範本提及勾選框語法
 
-The plan header should note that tasks and steps use checkbox syntax. Update the header comment:
+計畫標頭需註明任務與步驟使用勾選框語法。更新標頭註解：
 
 ```markdown
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Tasks and steps use checkbox (`- [ ]`) syntax for tracking.
 ```
 
-- [ ] **Step 3:** Verify the change
+- [ ] **步驟 3：**驗證變更
 
-Run: `grep -A 5 "For agentic workers:" skills/writing-plans/SKILL.md`
-Expected: Shows updated header with checkbox syntax mention
+執行：`grep -A 5 "For agentic workers:" skills/writing-plans/SKILL.md`
+預期：顯示已更新的標頭，包含勾選框語法說明
 
-- [ ] **Step 4:** Commit
+- [ ] **步驟 4：**提交
 
 ```bash
 git add skills/writing-plans/SKILL.md

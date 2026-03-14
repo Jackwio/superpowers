@@ -1,213 +1,213 @@
 ---
 name: receiving-code-review
-description: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation
+description: 當你收到程式碼審查回饋時使用，尤其是回饋不清楚或技術上可能有疑慮時 — 需要技術嚴謹與驗證，而不是表演式同意或盲目實作
 ---
 
-# Code Review Reception
+# 接收程式碼審查
 
-## Overview
+## 概覽
 
-Code review requires technical evaluation, not emotional performance.
+程式碼審查需要技術評估，不是情緒表演。
 
-**Core principle:** Verify before implementing. Ask before assuming. Technical correctness over social comfort.
+**核心原則：**先驗證再實作。先提問再假設。技術正確性優先於社交舒適。
 
-## The Response Pattern
-
-```
-WHEN receiving code review feedback:
-
-1. READ: Complete feedback without reacting
-2. UNDERSTAND: Restate requirement in own words (or ask)
-3. VERIFY: Check against codebase reality
-4. EVALUATE: Technically sound for THIS codebase?
-5. RESPOND: Technical acknowledgment or reasoned pushback
-6. IMPLEMENT: One item at a time, test each
-```
-
-## Forbidden Responses
-
-**NEVER:**
-- "You're absolutely right!" (explicit CLAUDE.md violation)
-- "Great point!" / "Excellent feedback!" (performative)
-- "Let me implement that now" (before verification)
-
-**INSTEAD:**
-- Restate the technical requirement
-- Ask clarifying questions
-- Push back with technical reasoning if wrong
-- Just start working (actions > words)
-
-## Handling Unclear Feedback
+## 回應模式
 
 ```
-IF any item is unclear:
-  STOP - do not implement anything yet
-  ASK for clarification on unclear items
+收到程式碼審查回饋時：
 
-WHY: Items may be related. Partial understanding = wrong implementation.
+1. 閱讀：完整看完，不立即反應
+2. 理解：用自己的話重述需求（或提問）
+3. 驗證：對照程式碼庫的現況
+4. 評估：對「這個」程式碼庫而言技術上是否正確？
+5. 回應：技術性確認或有理有據的反駁
+6. 實作：一次一項，逐項測試
 ```
 
-**Example:**
-```
-your human partner: "Fix 1-6"
-You understand 1,2,3,6. Unclear on 4,5.
+## 禁止回應
 
-❌ WRONG: Implement 1,2,3,6 now, ask about 4,5 later
-✅ RIGHT: "I understand items 1,2,3,6. Need clarification on 4 and 5 before proceeding."
-```
+**絕對不要：**
+- 「你完全說對了！」（明確違反 CLAUDE.md）
+- 「好觀點！」/「很棒的回饋！」（表演式）
+- 「我現在就實作。」（尚未驗證）
 
-## Source-Specific Handling
+**改用：**
+- 重述技術需求
+- 詢問釐清問題
+- 若不正確，以技術理由反駁
+- 直接開始修（行動勝於口頭）
 
-### From your human partner
-- **Trusted** - implement after understanding
-- **Still ask** if scope unclear
-- **No performative agreement**
-- **Skip to action** or technical acknowledgment
-
-### From External Reviewers
-```
-BEFORE implementing:
-  1. Check: Technically correct for THIS codebase?
-  2. Check: Breaks existing functionality?
-  3. Check: Reason for current implementation?
-  4. Check: Works on all platforms/versions?
-  5. Check: Does reviewer understand full context?
-
-IF suggestion seems wrong:
-  Push back with technical reasoning
-
-IF can't easily verify:
-  Say so: "I can't verify this without [X]. Should I [investigate/ask/proceed]?"
-
-IF conflicts with your human partner's prior decisions:
-  Stop and discuss with your human partner first
-```
-
-**your human partner's rule:** "External feedback - be skeptical, but check carefully"
-
-## YAGNI Check for "Professional" Features
+## 處理不清楚的回饋
 
 ```
-IF reviewer suggests "implementing properly":
-  grep codebase for actual usage
+若任何項目不清楚：
+  停止 — 先不要實作任何東西
+  詢問不清楚的項目
 
-  IF unused: "This endpoint isn't called. Remove it (YAGNI)?"
-  IF used: Then implement properly
+原因：項目可能彼此相關。只理解一部分 = 錯誤實作。
 ```
 
-**your human partner's rule:** "You and reviewer both report to me. If we don't need this feature, don't add it."
-
-## Implementation Order
-
+**範例：**
 ```
-FOR multi-item feedback:
-  1. Clarify anything unclear FIRST
-  2. Then implement in this order:
-     - Blocking issues (breaks, security)
-     - Simple fixes (typos, imports)
-     - Complex fixes (refactoring, logic)
-  3. Test each fix individually
-  4. Verify no regressions
+你的使用者："修 1-6"
+你理解 1,2,3,6，不清楚 4,5。
+
+❌ 錯：先實作 1,2,3,6，之後再問 4,5
+✅ 對：「我理解 1,2,3,6。需要釐清 4 與 5 才能繼續。」
 ```
 
-## When To Push Back
+## 依來源處理
 
-Push back when:
-- Suggestion breaks existing functionality
-- Reviewer lacks full context
-- Violates YAGNI (unused feature)
-- Technically incorrect for this stack
-- Legacy/compatibility reasons exist
-- Conflicts with your human partner's architectural decisions
+### 來自你的使用者
+- **可信** — 理解後再實作
+- **仍可提問** 若範圍不清
+- **不要表演式認同**
+- **直接行動**或技術確認
 
-**How to push back:**
-- Use technical reasoning, not defensiveness
-- Ask specific questions
-- Reference working tests/code
-- Involve your human partner if architectural
-
-**Signal if uncomfortable pushing back out loud:** "Strange things are afoot at the Circle K"
-
-## Acknowledging Correct Feedback
-
-When feedback IS correct:
+### 來自外部審查者
 ```
-✅ "Fixed. [Brief description of what changed]"
-✅ "Good catch - [specific issue]. Fixed in [location]."
-✅ [Just fix it and show in the code]
+在實作前：
+  1. 檢查：對「這個」程式碼庫是否技術正確？
+  2. 檢查：是否會破壞既有功能？
+  3. 檢查：現有實作的理由是什麼？
+  4. 檢查：是否適用所有平台/版本？
+  5. 檢查：審查者是否理解完整脈絡？
 
-❌ "You're absolutely right!"
-❌ "Great point!"
-❌ "Thanks for catching that!"
-❌ "Thanks for [anything]"
-❌ ANY gratitude expression
+若建議看起來不對：
+  以技術理由反駁
+
+若無法輕易驗證：
+  直接說明：「沒有 [X] 我無法驗證。要我 [調查/詢問/直接繼續] 嗎？」
+
+若與使用者先前決策衝突：
+  先停下來與使用者討論
 ```
 
-**Why no thanks:** Actions speak. Just fix it. The code itself shows you heard the feedback.
+**你的使用者規則：**「外部回饋 — 保持懷疑，但仔細檢查」
 
-**If you catch yourself about to write "Thanks":** DELETE IT. State the fix instead.
+## 針對「更專業」功能的 YAGNI 檢查
 
-## Gracefully Correcting Your Pushback
-
-If you pushed back and were wrong:
 ```
-✅ "You were right - I checked [X] and it does [Y]. Implementing now."
-✅ "Verified this and you're correct. My initial understanding was wrong because [reason]. Fixing."
+若審查者建議「要好好實作」：
+  grep 程式碼庫找實際使用處
 
-❌ Long apology
-❌ Defending why you pushed back
-❌ Over-explaining
+  若未使用：「這個端點沒有被呼叫。要移除它（YAGNI）嗎？」
+  若有使用：再好好實作
 ```
 
-State the correction factually and move on.
+**你的使用者規則：**「你和審查者都向我回報。如果不需要這功能，就不要加。」
 
-## Common Mistakes
+## 實作順序
 
-| Mistake | Fix |
+```
+多項回饋時：
+  1. 先釐清不清楚的部分
+  2. 再依順序實作：
+     - 阻斷性問題（壞掉、安全性）
+     - 簡單修正（拼字、匯入）
+     - 複雜修正（重構、邏輯）
+  3. 每一項都要獨立測試
+  4. 驗證沒有回歸
+```
+
+## 何時需要反駁
+
+在以下情況提出技術性反駁：
+- 建議會破壞既有功能
+- 審查者缺乏完整脈絡
+- 違反 YAGNI（未使用的功能）
+- 對此技術棧而言不正確
+- 有歷史/相容性理由
+- 與使用者的架構決策衝突
+
+**如何反駁：**
+- 用技術理由，不要防衛性語氣
+- 提出具體問題
+- 引用可運作的測試/程式碼
+- 若涉及架構，請使用者參與
+
+**若你覺得不好意思公開反駁：**「Strange things are afoot at the Circle K」
+
+## 正確回饋的回應方式
+
+當回饋**正確**時：
+```
+✅ 「已修正。[簡短說明變更]」
+✅ 「抓得好 — [具體問題]。已在 [位置] 修正。」
+✅ [直接修正並用程式碼呈現]
+
+❌ 「你完全說對了！」
+❌ 「好觀點！」
+❌ 「謝謝你提醒！」
+❌ 「謝謝你的[任何事]」
+❌ 任何感謝語
+```
+
+**為什麼不能說謝謝：**行動本身就是回應。直接修正。程式碼會證明你聽到了回饋。
+
+**如果你發現自己要寫「謝謝」：**刪掉它。直接說修正。
+
+## 優雅修正你的反駁
+
+若你先反駁、後來發現錯了：
+```
+✅ 「你說得對 — 我檢查了 [X]，確實是 [Y]。正在修正。」
+✅ 「已驗證，你是對的。我一開始的理解錯在 [原因]。正在修正。」
+
+❌ 長篇道歉
+❌ 為什麼你會反駁的辯解
+❌ 過度解釋
+```
+
+務實說明修正，然後往前走。
+
+## 常見錯誤
+
+| 錯誤 | 修正 |
 |---------|-----|
-| Performative agreement | State requirement or just act |
-| Blind implementation | Verify against codebase first |
-| Batch without testing | One at a time, test each |
-| Assuming reviewer is right | Check if breaks things |
-| Avoiding pushback | Technical correctness > comfort |
-| Partial implementation | Clarify all items first |
-| Can't verify, proceed anyway | State limitation, ask for direction |
+| 表演式認同 | 直接說需求或直接行動 |
+| 盲目實作 | 先對照程式碼驗證 |
+| 批次不測試 | 一次一項，逐項測試 |
+| 假設審查者正確 | 檢查是否會破壞現有功能 |
+| 避免反駁 | 技術正確性 > 舒適 |
+| 部分實作 | 先釐清全部項目 |
+| 無法驗證也照做 | 說明限制並詢問方向 |
 
-## Real Examples
+## 真實範例
 
-**Performative Agreement (Bad):**
+**表演式認同（不佳）：**
 ```
-Reviewer: "Remove legacy code"
-❌ "You're absolutely right! Let me remove that..."
-```
-
-**Technical Verification (Good):**
-```
-Reviewer: "Remove legacy code"
-✅ "Checking... build target is 10.15+, this API needs 13+. Need legacy for backward compat. Current impl has wrong bundle ID - fix it or drop pre-13 support?"
+審查者：「移除舊版程式碼」
+❌ 「你完全說對了！我來移除...」
 ```
 
-**YAGNI (Good):**
+**技術驗證（良好）：**
 ```
-Reviewer: "Implement proper metrics tracking with database, date filters, CSV export"
-✅ "Grepped codebase - nothing calls this endpoint. Remove it (YAGNI)? Or is there usage I'm missing?"
-```
-
-**Unclear Item (Good):**
-```
-your human partner: "Fix items 1-6"
-You understand 1,2,3,6. Unclear on 4,5.
-✅ "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
+審查者：「移除舊版程式碼」
+✅ 「正在檢查...建置目標是 10.15+，這個 API 需要 13+。需要保留舊版以相容。現在的實作 bundle ID 錯了 — 要修正它還是直接放棄 13 以下支援？」
 ```
 
-## GitHub Thread Replies
+**YAGNI（良好）：**
+```
+審查者：「用資料庫、日期篩選、CSV 匯出來完整追蹤 metrics」
+✅ 「已 grep 程式碼庫 — 沒有任何地方呼叫這個端點。要移除它（YAGNI）嗎？還是有我漏掉的使用情境？」
+```
 
-When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
+**不清楚項目（良好）：**
+```
+你的使用者：「修 1-6」
+你理解 1,2,3,6，不清楚 4,5。
+✅ 「我理解 1,2,3,6。需要釐清 4 與 5 才能開始實作。」
+```
 
-## The Bottom Line
+## GitHub 討論串回覆
 
-**External feedback = suggestions to evaluate, not orders to follow.**
+回覆 GitHub inline review 時，請在該留言串中回覆（`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`），不要用 PR 頂層留言。
 
-Verify. Question. Then implement.
+## 底線
 
-No performative agreement. Technical rigor always.
+**外部回饋是建議，不是命令。**
+
+先驗證。再提問。然後實作。
+
+不要表演式認同。永遠以技術嚴謹為先。

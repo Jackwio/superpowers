@@ -1,119 +1,119 @@
-# Creation Log: Systematic Debugging Skill
+# 建立紀錄：系統化除錯技能
 
-Reference example of extracting, structuring, and bulletproofing a critical skill.
+作為提取、結構化與強化關鍵技能的參考範例。
 
-## Source Material
+## 原始素材
 
-Extracted debugging framework from `/Users/jesse/.claude/CLAUDE.md`:
-- 4-phase systematic process (Investigation → Pattern Analysis → Hypothesis → Implementation)
-- Core mandate: ALWAYS find root cause, NEVER fix symptoms
-- Rules designed to resist time pressure and rationalization
+從 `/Users/jesse/.claude/CLAUDE.md` 擷取除錯框架：
+- 4 階段系統化流程（Investigation → Pattern Analysis → Hypothesis → Implementation）
+- 核心要求：永遠找根因，絕不只修症狀
+- 規則設計用於抵抗時間壓力與合理化
 
-## Extraction Decisions
+## 擷取決策
 
-**What to include:**
-- Complete 4-phase framework with all rules
-- Anti-shortcuts ("NEVER fix symptom", "STOP and re-analyze")
-- Pressure-resistant language ("even if faster", "even if I seem in a hurry")
-- Concrete steps for each phase
+**包含內容：**
+- 完整的 4 階段框架與所有規則
+- 反捷徑規則（「絕不修症狀」、「停止並重新分析」）
+- 抗壓用語（「即使更快」、「即使我看起來很急」）
+- 每階段的具體步驟
 
-**What to leave out:**
-- Project-specific context
-- Repetitive variations of same rule
-- Narrative explanations (condensed to principles)
+**排除內容：**
+- 專案特定脈絡
+- 同一規則的重複變體
+- 敘事性說明（壓縮為原則）
 
-## Structure Following skill-creation/SKILL.md
+## 結構遵循 skill-creation/SKILL.md
 
-1. **Rich when_to_use** - Included symptoms and anti-patterns
-2. **Type: technique** - Concrete process with steps
-3. **Keywords** - "root cause", "symptom", "workaround", "debugging", "investigation"
-4. **Flowchart** - Decision point for "fix failed" → re-analyze vs add more fixes
-5. **Phase-by-phase breakdown** - Scannable checklist format
-6. **Anti-patterns section** - What NOT to do (critical for this skill)
+1. **豐富的 when_to_use** - 包含症狀與反模式
+2. **類型：技術** - 具體流程與步驟
+3. **關鍵字** -「root cause」「symptom」「workaround」「debugging」「investigation」
+4. **流程圖** - 對「修正失敗」→ 重新分析 vs 加更多修正
+5. **逐階段拆解** - 可掃描的清單格式
+6. **反模式章節** - 不該做什麼（此技能的關鍵）
 
-## Bulletproofing Elements
+## 強化要素
 
-Framework designed to resist rationalization under pressure:
+框架設計用於抵抗壓力下的合理化：
 
-### Language Choices
-- "ALWAYS" / "NEVER" (not "should" / "try to")
-- "even if faster" / "even if I seem in a hurry"
-- "STOP and re-analyze" (explicit pause)
-- "Don't skip past" (catches the actual behavior)
+### 用語選擇
+- 「永遠」/「絕不」（不是「應該」/「盡量」）
+- 「即使更快」/「即使我看起來很急」
+- 「停止並重新分析」（明確暫停）
+- 「不要跳過」（對準實際行為）
 
-### Structural Defenses
-- **Phase 1 required** - Can't skip to implementation
-- **Single hypothesis rule** - Forces thinking, prevents shotgun fixes
-- **Explicit failure mode** - "IF your first fix doesn't work" with mandatory action
-- **Anti-patterns section** - Shows exactly what shortcuts look like
+### 結構防禦
+- **第 1 階段必做** - 不能跳到實作
+- **單一假設規則** - 強迫思考，避免散彈修法
+- **明確失敗處置** -「若第一個修正無效」且必須採取行動
+- **反模式章節** - 明確展示捷徑的樣貌
 
-### Redundancy
-- Root cause mandate in overview + when_to_use + Phase 1 + implementation rules
-- "NEVER fix symptom" appears 4 times in different contexts
-- Each phase has explicit "don't skip" guidance
+### 冗餘設計
+- 根因要求出現在概覽 + when_to_use + 第 1 階段 + 實作規則
+- 「絕不修症狀」在不同脈絡出現 4 次
+- 每階段都有「不要跳過」的明確指引
 
-## Testing Approach
+## 測試方式
 
-Created 4 validation tests following skills/meta/testing-skills-with-subagents:
+依 skills/meta/testing-skills-with-subagents 建立 4 個驗證測試：
 
-### Test 1: Academic Context (No Pressure)
-- Simple bug, no time pressure
-- **Result:** Perfect compliance, complete investigation
+### 測試 1：學術情境（無壓力）
+- 簡單 bug，無時間壓力
+- **結果：**完全遵循、完整調查
 
-### Test 2: Time Pressure + Obvious Quick Fix
-- User "in a hurry", symptom fix looks easy
-- **Result:** Resisted shortcut, followed full process, found real root cause
+### 測試 2：時間壓力 + 明顯快修
+- 使用者「很急」，症狀修法看似容易
+- **結果：**拒絕捷徑，完整流程，找到真正根因
 
-### Test 3: Complex System + Uncertainty
-- Multi-layer failure, unclear if can find root cause
-- **Result:** Systematic investigation, traced through all layers, found source
+### 測試 3：複雜系統 + 不確定
+- 多層故障，不確定是否能找出根因
+- **結果：**系統化調查，逐層追溯，找到來源
 
-### Test 4: Failed First Fix
-- Hypothesis doesn't work, temptation to add more fixes
-- **Result:** Stopped, re-analyzed, formed new hypothesis (no shotgun)
+### 測試 4：第一個修正失敗
+- 假設無效，容易想加更多修正
+- **結果：**停止、重新分析、形成新假設（不散彈）
 
-**All tests passed.** No rationalizations found.
+**所有測試通過。**未發現合理化。
 
-## Iterations
+## 迭代
 
-### Initial Version
-- Complete 4-phase framework
-- Anti-patterns section
-- Flowchart for "fix failed" decision
+### 初版
+- 完整 4 階段框架
+- 反模式章節
+- 「修正失敗」決策流程圖
 
-### Enhancement 1: TDD Reference
-- Added link to skills/testing/test-driven-development
-- Note explaining TDD's "simplest code" ≠ debugging's "root cause"
-- Prevents confusion between methodologies
+### 增強 1：TDD 參考
+- 新增 skills/testing/test-driven-development 連結
+- 說明 TDD 的「最簡單程式碼」≠ 除錯的「根因」
+- 避免方法論混淆
 
-## Final Outcome
+## 最終成果
 
-Bulletproof skill that:
-- ✅ Clearly mandates root cause investigation
-- ✅ Resists time pressure rationalization
-- ✅ Provides concrete steps for each phase
-- ✅ Shows anti-patterns explicitly
-- ✅ Tested under multiple pressure scenarios
-- ✅ Clarifies relationship to TDD
-- ✅ Ready for use
+強化後的技能：
+- ✅ 明確要求根因調查
+- ✅ 抵抗時間壓力合理化
+- ✅ 每階段提供具體步驟
+- ✅ 明確展示反模式
+- ✅ 多個壓力情境測試
+- ✅ 釐清與 TDD 的關係
+- ✅ 可直接使用
 
-## Key Insight
+## 關鍵洞見
 
-**Most important bulletproofing:** Anti-patterns section showing exact shortcuts that feel justified in the moment. When Claude thinks "I'll just add this one quick fix", seeing that exact pattern listed as wrong creates cognitive friction.
+**最重要的強化：**反模式章節把「當下看似合理的捷徑」明確列出。當 Claude 想「我就先加個快修」，看到同樣模式被列為錯誤，就會產生認知摩擦。
 
-## Usage Example
+## 使用範例
 
-When encountering a bug:
-1. Load skill: skills/debugging/systematic-debugging
-2. Read overview (10 sec) - reminded of mandate
-3. Follow Phase 1 checklist - forced investigation
-4. If tempted to skip - see anti-pattern, stop
-5. Complete all phases - root cause found
+遇到 bug 時：
+1. 載入技能：skills/debugging/systematic-debugging
+2. 閱讀概覽（10 秒）— 重申核心要求
+3. 依第 1 階段清單執行 — 強制調查
+4. 若想跳過 — 看到反模式，停止
+5. 完成所有階段 — 找出根因
 
-**Time investment:** 5-10 minutes
-**Time saved:** Hours of symptom-whack-a-mole
+**時間投入：**5-10 分鐘
+**節省時間：**避免花數小時打地鼠式修症狀
 
 ---
 
-*Created: 2025-10-03*
-*Purpose: Reference example for skill extraction and bulletproofing*
+*建立日期：2025-10-03*
+*用途：技能擷取與強化的參考範例*

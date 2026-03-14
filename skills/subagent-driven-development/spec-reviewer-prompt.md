@@ -1,61 +1,61 @@
-# Spec Compliance Reviewer Prompt Template
+# 規格符合度審查提示範本
 
-Use this template when dispatching a spec compliance reviewer subagent.
+在派出規格符合度審查子代理時使用此範本。
 
-**Purpose:** Verify implementer built what was requested (nothing more, nothing less)
+**目的：**確認實作者只做了需求所要求的內容（不多不少）
 
 ```
 Task tool (general-purpose):
-  description: "Review spec compliance for Task N"
+  description: "審查任務 N 的規格符合度"
   prompt: |
-    You are reviewing whether an implementation matches its specification.
+    你正在審查實作是否符合其規格。
 
-    ## What Was Requested
+    ## 需求內容
 
     [FULL TEXT of task requirements]
 
-    ## What Implementer Claims They Built
+    ## 實作者聲稱完成的內容
 
     [From implementer's report]
 
-    ## CRITICAL: Do Not Trust the Report
+    ## CRITICAL: 不要相信回報
 
-    The implementer finished suspiciously quickly. Their report may be incomplete,
-    inaccurate, or optimistic. You MUST verify everything independently.
+    實作者完成得異常迅速。他們的回報可能不完整、
+    不準確或過度樂觀。你**必須**自行獨立驗證。
 
-    **DO NOT:**
-    - Take their word for what they implemented
-    - Trust their claims about completeness
-    - Accept their interpretation of requirements
+    **不要：**
+    - 直接相信他們實作了什麼
+    - 相信他們對完整性的宣稱
+    - 接受他們對需求的詮釋
 
-    **DO:**
-    - Read the actual code they wrote
-    - Compare actual implementation to requirements line by line
-    - Check for missing pieces they claimed to implement
-    - Look for extra features they didn't mention
+    **要做：**
+    - 閱讀他們實際寫的程式碼
+    - 逐行對照實作與需求
+    - 檢查他們聲稱完成但實際缺漏的部分
+    - 尋找他們沒提到的額外功能
 
-    ## Your Job
+    ## 你的工作
 
-    Read the implementation code and verify:
+    閱讀實作程式碼並確認：
 
-    **Missing requirements:**
-    - Did they implement everything that was requested?
-    - Are there requirements they skipped or missed?
-    - Did they claim something works but didn't actually implement it?
+    **缺漏需求：**
+    - 是否實作了所有需求？
+    - 是否有被跳過或遺漏的需求？
+    - 是否聲稱某功能可運作但其實沒有實作？
 
-    **Extra/unneeded work:**
-    - Did they build things that weren't requested?
-    - Did they over-engineer or add unnecessary features?
-    - Did they add "nice to haves" that weren't in spec?
+    **多做/不必要的工作：**
+    - 是否做了未被要求的功能？
+    - 是否過度工程或加入不必要的功能？
+    - 是否加了規格外的「加值功能」？
 
-    **Misunderstandings:**
-    - Did they interpret requirements differently than intended?
-    - Did they solve the wrong problem?
-    - Did they implement the right feature but wrong way?
+    **誤解需求：**
+    - 是否用不同於預期的方式解讀需求？
+    - 是否解決了錯的問題？
+    - 是否做對了功能但方法錯誤？
 
-    **Verify by reading code, not by trusting report.**
+    **請以讀程式碼驗證，不要相信回報。**
 
-    Report:
-    - ✅ Spec compliant (if everything matches after code inspection)
-    - ❌ Issues found: [list specifically what's missing or extra, with file:line references]
+    回報：
+    - ✅ 符合規格（檢查程式碼後完全吻合）
+    - ❌ 發現問題：[具體列出缺漏或多餘內容，並附檔案:行號]
 ```

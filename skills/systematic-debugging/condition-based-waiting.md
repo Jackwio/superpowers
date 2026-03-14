@@ -1,37 +1,37 @@
-# Condition-Based Waiting
+# 條件式等待
 
-## Overview
+## 概覽
 
-Flaky tests often guess at timing with arbitrary delays. This creates race conditions where tests pass on fast machines but fail under load or in CI.
+易脆弱的測試常用任意延遲來猜時間，造成競態：在快機器通過，但在高負載或 CI 失敗。
 
-**Core principle:** Wait for the actual condition you care about, not a guess about how long it takes.
+**核心原則：**等待你真正關心的條件，而不是猜測所需時間。
 
-## When to Use
+## 何時使用
 
 ```dot
 digraph when_to_use {
-    "Test uses setTimeout/sleep?" [shape=diamond];
-    "Testing timing behavior?" [shape=diamond];
-    "Document WHY timeout needed" [shape=box];
-    "Use condition-based waiting" [shape=box];
+    "測試用了 setTimeout/sleep？" [shape=diamond];
+    "在測試時間行為？" [shape=diamond];
+    "記錄為何需要 timeout" [shape=box];
+    "使用條件式等待" [shape=box];
 
-    "Test uses setTimeout/sleep?" -> "Testing timing behavior?" [label="yes"];
-    "Testing timing behavior?" -> "Document WHY timeout needed" [label="yes"];
-    "Testing timing behavior?" -> "Use condition-based waiting" [label="no"];
+    "測試用了 setTimeout/sleep？" -> "在測試時間行為？" [label="是"];
+    "在測試時間行為？" -> "記錄為何需要 timeout" [label="是"];
+    "在測試時間行為？" -> "使用條件式等待" [label="否"];
 }
 ```
 
-**Use when:**
-- Tests have arbitrary delays (`setTimeout`, `sleep`, `time.sleep()`)
-- Tests are flaky (pass sometimes, fail under load)
-- Tests timeout when run in parallel
-- Waiting for async operations to complete
+**使用時機：**
+- 測試含任意延遲（`setTimeout`、`sleep`、`time.sleep()`）
+- 測試易脆弱（有時通過、有時在負載下失敗）
+- 平行執行時測試逾時
+- 等待非同步操作完成
 
-**Don't use when:**
-- Testing actual timing behavior (debounce, throttle intervals)
-- Always document WHY if using arbitrary timeout
+**不要用在：**
+- 測試真正的時間行為（debounce、throttle 間隔）
+- 若使用任意 timeout，務必記錄原因
 
-## Core Pattern
+## 核心模式
 
 ```typescript
 // ❌ BEFORE: Guessing at timing
@@ -45,19 +45,19 @@ const result = getResult();
 expect(result).toBeDefined();
 ```
 
-## Quick Patterns
+## 快速模式
 
-| Scenario | Pattern |
+| 情境 | 模式 |
 |----------|---------|
-| Wait for event | `waitFor(() => events.find(e => e.type === 'DONE'))` |
-| Wait for state | `waitFor(() => machine.state === 'ready')` |
-| Wait for count | `waitFor(() => items.length >= 5)` |
-| Wait for file | `waitFor(() => fs.existsSync(path))` |
-| Complex condition | `waitFor(() => obj.ready && obj.value > 10)` |
+| 等待事件 | `waitFor(() => events.find(e => e.type === 'DONE'))` |
+| 等待狀態 | `waitFor(() => machine.state === 'ready')` |
+| 等待數量 | `waitFor(() => items.length >= 5)` |
+| 等待檔案 | `waitFor(() => fs.existsSync(path))` |
+| 複雜條件 | `waitFor(() => obj.ready && obj.value > 10)` |
 
-## Implementation
+## 實作
 
-Generic polling function:
+通用輪詢函式：
 ```typescript
 async function waitFor<T>(
   condition: () => T | undefined | null | false,
@@ -79,20 +79,20 @@ async function waitFor<T>(
 }
 ```
 
-See `condition-based-waiting-example.ts` in this directory for complete implementation with domain-specific helpers (`waitForEvent`, `waitForEventCount`, `waitForEventMatch`) from actual debugging session.
+本目錄下的 `condition-based-waiting-example.ts` 有完整實作，以及來自實際除錯會話的領域輔助函式（`waitForEvent`、`waitForEventCount`、`waitForEventMatch`）。
 
-## Common Mistakes
+## 常見錯誤
 
-**❌ Polling too fast:** `setTimeout(check, 1)` - wastes CPU
-**✅ Fix:** Poll every 10ms
+**❌ 輪詢太快：**`setTimeout(check, 1)` — 浪費 CPU
+**✅ 修正：**每 10ms 輪詢一次
 
-**❌ No timeout:** Loop forever if condition never met
-**✅ Fix:** Always include timeout with clear error
+**❌ 沒有 timeout：**條件永遠不成立就會無限迴圈
+**✅ 修正：**永遠設定 timeout，且錯誤訊息要清楚
 
-**❌ Stale data:** Cache state before loop
-**✅ Fix:** Call getter inside loop for fresh data
+**❌ 資料過期：**在迴圈前快取狀態
+**✅ 修正：**在迴圈內呼叫 getter 取得最新資料
 
-## When Arbitrary Timeout IS Correct
+## 何時任意 timeout 才是正確
 
 ```typescript
 // Tool ticks every 100ms - need 2 ticks to verify partial output
@@ -101,15 +101,15 @@ await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behavior
 // 200ms = 2 ticks at 100ms intervals - documented and justified
 ```
 
-**Requirements:**
-1. First wait for triggering condition
-2. Based on known timing (not guessing)
-3. Comment explaining WHY
+**要求：**
+1. 先等待觸發條件
+2. 依已知時間而非猜測
+3. 註解說明原因
 
-## Real-World Impact
+## 真實影響
 
-From debugging session (2025-10-03):
-- Fixed 15 flaky tests across 3 files
-- Pass rate: 60% → 100%
-- Execution time: 40% faster
-- No more race conditions
+來自除錯會話（2025-10-03）：
+- 修復 3 個檔案中的 15 個易脆弱測試
+- 通過率：60% → 100%
+- 執行時間：快 40%
+- 不再有競態

@@ -1,40 +1,40 @@
-# Visual Brainstorming Refactor Implementation Plan
+# 視覺化腦力激盪重構實作計畫
 
-> **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **給 agentic workers：** 必須使用 superpowers:subagent-driven-development（若可用子代理）或 superpowers:executing-plans 來實作此計畫。步驟使用核取方塊（`- [ ]`）語法以追蹤。
 
-**Goal:** Refactor visual brainstorming from blocking TUI feedback model to non-blocking "Browser Displays, Terminal Commands" architecture.
+**目標：** 將視覺化腦力激盪從阻塞式 TUI 回饋模型，重構為非阻塞的「瀏覽器顯示、終端指令」架構。
 
-**Architecture:** Browser becomes an interactive display; terminal stays the conversation channel. Server writes user events to a per-screen `.events` file that Claude reads on its next turn. Eliminates `wait-for-feedback.sh` and all `TaskOutput` blocking.
+**架構：** 瀏覽器成為互動顯示；終端保持對話通道。伺服器把使用者事件寫到每個畫面的 `.events` 檔，Claude 在下一回合讀取。移除 `wait-for-feedback.sh` 與所有 `TaskOutput` 阻塞。
 
-**Tech Stack:** Node.js (Express, ws, chokidar), vanilla HTML/CSS/JS
+**技術堆疊：** Node.js（Express、ws、chokidar）、原生 HTML/CSS/JS
 
-**Spec:** `docs/superpowers/specs/2026-02-19-visual-brainstorming-refactor-design.md`
-
----
-
-## File Map
-
-| File | Action | Responsibility |
-|------|--------|---------------|
-| `lib/brainstorm-server/index.js` | Modify | Server: add `.events` file writing, clear on new screen, replace `wrapInFrame` |
-| `lib/brainstorm-server/frame-template.html` | Modify | Template: remove feedback footer, add content placeholder + selection indicator |
-| `lib/brainstorm-server/helper.js` | Modify | Client JS: remove send/feedback functions, narrow to click capture + indicator updates |
-| `lib/brainstorm-server/wait-for-feedback.sh` | Delete | No longer needed |
-| `skills/brainstorming/visual-companion.md` | Modify | Skill instructions: rewrite loop to non-blocking flow |
-| `tests/brainstorm-server/server.test.js` | Modify | Tests: update for new template structure and helper.js API |
+**規格：** `docs/superpowers/specs/2026-02-19-visual-brainstorming-refactor-design.md`
 
 ---
 
-## Chunk 1: Server, Template, Client, Tests, Skill
+## 檔案對照
 
-### Task 1: Update `frame-template.html`
+| 檔案 | 動作 | 責任 |
+|------|------|------|
+| `lib/brainstorm-server/index.js` | 修改 | 伺服器：新增 `.events` 檔寫入、新畫面時清除、取代 `wrapInFrame` |
+| `lib/brainstorm-server/frame-template.html` | 修改 | 模板：移除回饋頁尾，加入內容占位與選擇指示器 |
+| `lib/brainstorm-server/helper.js` | 修改 | 用戶端 JS：移除 send/feedback 函式，縮小為點擊擷取 + 指示器更新 |
+| `lib/brainstorm-server/wait-for-feedback.sh` | 刪除 | 不再需要 |
+| `skills/brainstorming/visual-companion.md` | 修改 | 技能指示：改寫為非阻塞流程 |
+| `tests/brainstorm-server/server.test.js` | 修改 | 測試：更新模板結構與 helper.js API |
 
-**Files:**
-- Modify: `lib/brainstorm-server/frame-template.html`
+---
 
-- [ ] **Step 1: Remove the feedback footer HTML**
+## 區塊 1：伺服器、模板、用戶端、測試、技能
 
-Replace the feedback-footer div (lines 227-233) with a selection indicator bar:
+### 任務 1：更新 `frame-template.html`
+
+**檔案：**
+- 修改：`lib/brainstorm-server/frame-template.html`
+
+- [ ] **步驟 1：移除回饋頁尾 HTML**
+
+用選擇指示器列取代 feedback-footer div（第 227-233 行）：
 
 ```html
   <div class="indicator-bar">
@@ -42,7 +42,7 @@ Replace the feedback-footer div (lines 227-233) with a selection indicator bar:
   </div>
 ```
 
-Also replace the default content inside `#claude-content` (lines 220-223) with the content placeholder:
+同時將 `#claude-content` 內的預設內容（第 220-223 行）替換為內容占位：
 
 ```html
     <div id="claude-content">
@@ -50,11 +50,11 @@ Also replace the default content inside `#claude-content` (lines 220-223) with t
     </div>
 ```
 
-- [ ] **Step 2: Replace feedback footer CSS with indicator bar CSS**
+- [ ] **步驟 2：以指示器列 CSS 取代回饋頁尾 CSS**
 
-Remove the `.feedback-footer`, `.feedback-footer label`, `.feedback-row`, and the textarea/button styles within `.feedback-footer` (lines 82-112).
+移除 `.feedback-footer`、`.feedback-footer label`、`.feedback-row`，以及 `.feedback-footer` 內 textarea/button 的樣式（第 82-112 行）。
 
-Add indicator bar CSS:
+新增指示器列 CSS：
 
 ```css
     .indicator-bar {
@@ -74,15 +74,15 @@ Add indicator bar CSS:
     }
 ```
 
-- [ ] **Step 3: Verify template renders**
+- [ ] **步驟 3：確認模板可渲染**
 
-Run the test suite to check the template still loads:
+執行測試套件，確認模板仍可載入：
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && node tests/brainstorm-server/server.test.js
 ```
-Expected: Tests 1-5 should still pass. Tests 6-8 may fail (expected — they assert old structure).
+預期：測試 1-5 應仍可通過。測試 6-8 可能失敗（預期 — 它們仍在驗證舊結構）。
 
-- [ ] **Step 4: Commit**
+- [ ] **步驟 4：提交**
 
 ```bash
 git add lib/brainstorm-server/frame-template.html
@@ -91,14 +91,14 @@ git commit -m "Replace feedback footer with selection indicator bar in brainstor
 
 ---
 
-### Task 2: Update `index.js` — content injection and `.events` file
+### 任務 2：更新 `index.js` — 內容注入與 `.events` 檔
 
-**Files:**
-- Modify: `lib/brainstorm-server/index.js`
+**檔案：**
+- 修改：`lib/brainstorm-server/index.js`
 
-- [ ] **Step 1: Write failing test for `.events` file writing**
+- [ ] **步驟 1：為 `.events` 檔寫入加入失敗測試**
 
-Add to `tests/brainstorm-server/server.test.js` after Test 4 area — a new test that sends a WebSocket event with a `choice` field and verifies `.events` file is written:
+在 `tests/brainstorm-server/server.test.js` 的 Test 4 區段後新增測試：送出包含 `choice` 的 WebSocket 事件，並驗證 `.events` 檔被寫入：
 
 ```javascript
     // Test: Choice events written to .events file
@@ -119,16 +119,16 @@ Add to `tests/brainstorm-server/server.test.js` after Test 4 area — a new test
     console.log('  PASS');
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **步驟 2：執行測試確認失敗**
 
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && node tests/brainstorm-server/server.test.js
 ```
-Expected: New test FAILS — `.events` file doesn't exist yet.
+預期：新測試會失敗 — `.events` 尚不存在。
 
-- [ ] **Step 3: Write failing test for `.events` file clearing on new screen**
+- [ ] **步驟 3：為 `.events` 新畫面清除加入失敗測試**
 
-Add another test:
+新增另一個測試：
 
 ```javascript
     // Test: .events cleared on new screen
@@ -141,16 +141,16 @@ Add another test:
     console.log('  PASS');
 ```
 
-- [ ] **Step 4: Run test to verify it fails**
+- [ ] **步驟 4：執行測試確認失敗**
 
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && node tests/brainstorm-server/server.test.js
 ```
-Expected: New test FAILS — `.events` not cleared on screen push.
+預期：新測試會失敗 — `.events` 沒有在推送新畫面時清除。
 
-- [ ] **Step 5: Implement `.events` file writing in `index.js`**
+- [ ] **步驟 5：在 `index.js` 實作 `.events` 檔寫入**
 
-In the WebSocket `message` handler (line 74-77 of `index.js`), after the `console.log`, add:
+在 WebSocket `message` handler（`index.js` 第 74-77 行）中，於 `console.log` 後加入：
 
 ```javascript
     // Write user events to .events file for Claude to read
@@ -160,7 +160,7 @@ In the WebSocket `message` handler (line 74-77 of `index.js`), after the `consol
     }
 ```
 
-In the chokidar `add` handler (line 104-111), add `.events` clearing:
+在 chokidar `add` handler（第 104-111 行）加入 `.events` 清除：
 
 ```javascript
     if (filePath.endsWith('.html')) {
@@ -173,9 +173,9 @@ In the chokidar `add` handler (line 104-111), add `.events` clearing:
     }
 ```
 
-- [ ] **Step 6: Replace `wrapInFrame` with comment placeholder injection**
+- [ ] **步驟 6：以註解占位注入取代 `wrapInFrame`**
 
-Replace the `wrapInFrame` function (lines 27-32 of `index.js`):
+替換 `wrapInFrame` 函式（`index.js` 第 27-32 行）：
 
 ```javascript
 function wrapInFrame(content) {
@@ -183,14 +183,14 @@ function wrapInFrame(content) {
 }
 ```
 
-- [ ] **Step 7: Run all tests**
+- [ ] **步驟 7：執行所有測試**
 
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && node tests/brainstorm-server/server.test.js
 ```
-Expected: New `.events` tests PASS. Existing tests may still have failures from old assertions (fixed in Task 4).
+預期：新的 `.events` 測試通過。其餘測試可能仍會因舊斷言而失敗（在任務 4 修正）。
 
-- [ ] **Step 8: Commit**
+- [ ] **步驟 8：提交**
 
 ```bash
 git add lib/brainstorm-server/index.js tests/brainstorm-server/server.test.js
@@ -199,30 +199,30 @@ git commit -m "Add .events file writing and comment-based content injection to b
 
 ---
 
-### Task 3: Simplify `helper.js`
+### 任務 3：簡化 `helper.js`
 
-**Files:**
-- Modify: `lib/brainstorm-server/helper.js`
+**檔案：**
+- 修改：`lib/brainstorm-server/helper.js`
 
-- [ ] **Step 1: Remove `sendToClaude` function**
+- [ ] **步驟 1：移除 `sendToClaude` 函式**
 
-Delete the `sendToClaude` function (lines 92-106) — the function body and the page takeover HTML.
+刪除 `sendToClaude` 函式（第 92-106 行）— 包含函式內容與頁面接管 HTML。
 
-- [ ] **Step 2: Remove `window.send` function**
+- [ ] **步驟 2：移除 `window.send` 函式**
 
-Delete the `window.send` function (lines 120-129) — was tied to the removed Send button.
+刪除 `window.send` 函式（第 120-129 行）— 它與已移除的 Send 按鈕相關。
 
-- [ ] **Step 3: Remove form submission and input change handlers**
+- [ ] **步驟 3：移除表單送出與輸入變更處理器**
 
-Delete the form submission handler (lines 57-71) and the input change handler (lines 73-89) including the `inputTimeout` variable.
+刪除表單送出 handler（第 57-71 行）與輸入變更 handler（第 73-89 行），包含 `inputTimeout` 變數。
 
-- [ ] **Step 4: Remove `pageshow` event listener**
+- [ ] **步驟 4：移除 `pageshow` 事件監聽器**
 
-Delete the `pageshow` listener we added earlier (no textarea to clear anymore).
+刪除之前新增的 `pageshow` listener（已無 textarea 可清）。
 
-- [ ] **Step 5: Narrow click handler to `[data-choice]` only**
+- [ ] **步驟 5：將點擊 handler 縮小為只處理 `[data-choice]`**
 
-Replace the click handler (lines 36-55) with a narrower version:
+用較精簡版本取代點擊 handler（第 36-55 行）：
 
 ```javascript
   // Capture clicks on choice elements
@@ -239,9 +239,9 @@ Replace the click handler (lines 36-55) with a narrower version:
   });
 ```
 
-- [ ] **Step 6: Add indicator bar update on choice click**
+- [ ] **步驟 6：在選擇點擊後更新指示器列**
 
-After the `sendEvent` call in the click handler, add:
+在 click handler 內 `sendEvent` 後加入：
 
 ```javascript
     // Update indicator bar
@@ -252,9 +252,9 @@ After the `sendEvent` call in the click handler, add:
     }
 ```
 
-- [ ] **Step 7: Remove `sendToClaude` from `window.brainstorm` API**
+- [ ] **步驟 7：從 `window.brainstorm` API 移除 `sendToClaude`**
 
-Update the `window.brainstorm` object (lines 132-136) to remove `sendToClaude`:
+更新 `window.brainstorm` 物件（第 132-136 行），移除 `sendToClaude`：
 
 ```javascript
   window.brainstorm = {
@@ -263,13 +263,13 @@ Update the `window.brainstorm` object (lines 132-136) to remove `sendToClaude`:
   };
 ```
 
-- [ ] **Step 8: Run tests**
+- [ ] **步驟 8：執行測試**
 
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && node tests/brainstorm-server/server.test.js
 ```
 
-- [ ] **Step 9: Commit**
+- [ ] **步驟 9：提交**
 
 ```bash
 git add lib/brainstorm-server/helper.js
@@ -278,39 +278,39 @@ git commit -m "Simplify helper.js: remove feedback functions, narrow to choice c
 
 ---
 
-### Task 4: Update tests for new structure
+### 任務 4：更新測試以符合新結構
 
-**Files:**
-- Modify: `tests/brainstorm-server/server.test.js`
+**檔案：**
+- 修改：`tests/brainstorm-server/server.test.js`
 
-**Note:** Line references below are from the _original_ file. Task 2 inserted new tests earlier in the file, so actual line numbers will be shifted. Find tests by their `console.log` labels (e.g., "Test 5:", "Test 6:").
+**注意：** 以下行號來自「原始」檔案。任務 2 已在檔案前段插入新測試，實際行號會偏移。請用 `console.log` 標籤（例如「Test 5:」、「Test 6:」）定位。
 
-- [ ] **Step 1: Update Test 5 (full document assertion)**
+- [ ] **步驟 1：更新 Test 5（完整文件斷言）**
 
-Find the Test 5 assertion `!fullRes.body.includes('feedback-footer')`. Change it to: Full documents should NOT have the indicator bar either (they're served as-is):
+找到 Test 5 的斷言 `!fullRes.body.includes('feedback-footer')`。改成：完整文件不應該有指示器列（它們是原樣提供）：
 
 ```javascript
     assert(!fullRes.body.includes('indicator-bar') || fullDoc.includes('indicator-bar'),
       'Should not wrap full documents in frame template');
 ```
 
-- [ ] **Step 2: Update Test 6 (fragment wrapping)**
+- [ ] **步驟 2：更新 Test 6（片段包裝）**
 
-Line 125: Replace `feedback-footer` assertion with indicator bar assertion:
+第 125 行：將 `feedback-footer` 斷言改成指示器列斷言：
 
 ```javascript
     assert(fragRes.body.includes('indicator-bar'), 'Fragment should get indicator bar from frame');
 ```
 
-Also verify content placeholder was replaced (fragment content appears, placeholder comment doesn't):
+同時驗證內容占位已被替換（片段內容出現，占位註解不存在）：
 
 ```javascript
     assert(!fragRes.body.includes('<!-- CONTENT -->'), 'Content placeholder should be replaced');
 ```
 
-- [ ] **Step 3: Update Test 7 (helper.js API)**
+- [ ] **步驟 3：更新 Test 7（helper.js API）**
 
-Lines 140-142: Update assertions to reflect the new API surface:
+第 140-142 行：更新斷言以反映新的 API 介面：
 
 ```javascript
     assert(helperContent.includes('toggleSelect'), 'helper.js should define toggleSelect');
@@ -320,9 +320,9 @@ Lines 140-142: Update assertions to reflect the new API surface:
     assert(!helperContent.includes('sendToClaude'), 'helper.js should not contain sendToClaude');
 ```
 
-- [ ] **Step 4: Replace Test 8 (sendToClaude theming) with indicator bar test**
+- [ ] **步驟 4：以指示器列測試取代 Test 8（sendToClaude 主題）**
 
-Replace Test 8 (lines 145-149) — `sendToClaude` no longer exists. Test the indicator bar instead:
+替換 Test 8（第 145-149 行）— `sendToClaude` 已不存在。改測指示器列：
 
 ```javascript
     // Test 8: Indicator bar uses CSS variables (theme support)
@@ -335,14 +335,14 @@ Replace Test 8 (lines 145-149) — `sendToClaude` no longer exists. Test the ind
     console.log('  PASS');
 ```
 
-- [ ] **Step 5: Run full test suite**
+- [ ] **步驟 5：執行完整測試套件**
 
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && node tests/brainstorm-server/server.test.js
 ```
-Expected: ALL tests PASS.
+預期：所有測試通過。
 
-- [ ] **Step 6: Commit**
+- [ ] **步驟 6：提交**
 
 ```bash
 git add tests/brainstorm-server/server.test.js
@@ -351,34 +351,34 @@ git commit -m "Update brainstorm server tests for new template structure and hel
 
 ---
 
-### Task 5: Delete `wait-for-feedback.sh`
+### 任務 5：刪除 `wait-for-feedback.sh`
 
-**Files:**
-- Delete: `lib/brainstorm-server/wait-for-feedback.sh`
+**檔案：**
+- 刪除：`lib/brainstorm-server/wait-for-feedback.sh`
 
-- [ ] **Step 1: Verify no other files import or reference `wait-for-feedback.sh`**
+- [ ] **步驟 1：確認沒有其他檔案引用 `wait-for-feedback.sh`**
 
-Search the codebase:
+搜尋整個程式碼庫：
 ```bash
 grep -r "wait-for-feedback" /Users/drewritter/prime-rad/superpowers/ --include="*.js" --include="*.md" --include="*.sh" --include="*.json"
 ```
 
-Expected references: only `visual-companion.md` (rewritten in Task 6) and possibly release notes (historical, leave as-is).
+預期引用：僅 `visual-companion.md`（在任務 6 會改寫）以及可能的 release notes（歷史，保留）。
 
-- [ ] **Step 2: Delete the file**
+- [ ] **步驟 2：刪除檔案**
 
 ```bash
 rm lib/brainstorm-server/wait-for-feedback.sh
 ```
 
-- [ ] **Step 3: Run tests to confirm nothing breaks**
+- [ ] **步驟 3：執行測試確認無誤**
 
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && node tests/brainstorm-server/server.test.js
 ```
-Expected: All tests PASS (no test referenced this file).
+預期：所有測試通過（沒有測試引用此檔案）。
 
-- [ ] **Step 4: Commit**
+- [ ] **步驟 4：提交**
 
 ```bash
 git add -u lib/brainstorm-server/wait-for-feedback.sh
@@ -387,30 +387,30 @@ git commit -m "Delete wait-for-feedback.sh: replaced by .events file"
 
 ---
 
-### Task 6: Rewrite `visual-companion.md`
+### 任務 6：改寫 `visual-companion.md`
 
-**Files:**
-- Modify: `skills/brainstorming/visual-companion.md`
+**檔案：**
+- 修改：`skills/brainstorming/visual-companion.md`
 
-- [ ] **Step 1: Update "How It Works" description (line 18)**
+- [ ] **步驟 1：更新「How It Works」描述（第 18 行）**
 
-Replace the sentence about receiving feedback "as JSON" with:
+將「以 JSON 接收回饋」的句子替換為：
 
 ```markdown
 The server watches a directory for HTML files and serves the newest one to the browser. You write HTML content, the user sees it in their browser and can click to select options. Selections are recorded to a `.events` file that you read on your next turn.
 ```
 
-- [ ] **Step 2: Update fragment description (line 20)**
+- [ ] **步驟 2：更新片段描述（第 20 行）**
 
-Remove "feedback footer" from the description of what the frame template provides:
+移除對「feedback footer」的描述：
 
 ```markdown
 **Content fragments vs full documents:** If your HTML file starts with `<!DOCTYPE` or `<html`, the server serves it as-is (just injects the helper script). Otherwise, the server automatically wraps your content in the frame template — adding the header, CSS theme, selection indicator, and all interactive infrastructure. **Write content fragments by default.** Only write full documents when you need complete control over the page.
 ```
 
-- [ ] **Step 3: Rewrite "The Loop" section (lines 36-61)**
+- [ ] **步驟 3：改寫「The Loop」章節（第 36-61 行）**
 
-Replace the entire "The Loop" section with:
+以以下內容取代整段「The Loop」：
 
 ```markdown
 ## The Loop
@@ -436,9 +436,9 @@ Replace the entire "The Loop" section with:
 5. Repeat until done.
 ```
 
-- [ ] **Step 4: Replace "User Feedback Format" section (lines 165-174)**
+- [ ] **步驟 4：取代「User Feedback Format」章節（第 165-174 行）**
 
-Replace with:
+替換為：
 
 ```markdown
 ## Browser Events Format
@@ -456,17 +456,17 @@ The full event stream shows the user's exploration path — they may click multi
 If `.events` doesn't exist, the user didn't interact with the browser — use only their terminal text.
 ```
 
-- [ ] **Step 5: Update "Writing Content Fragments" description (line 65)**
+- [ ] **步驟 5：更新「Writing Content Fragments」描述（第 65 行）**
 
-Remove "feedback footer" reference:
+移除「feedback footer」參照：
 
 ```markdown
 Write just the content that goes inside the page. The server wraps it in the frame template automatically (header, theme CSS, selection indicator, and all interactive infrastructure).
 ```
 
-- [ ] **Step 6: Update Reference section (lines 200-203)**
+- [ ] **步驟 6：更新 Reference 章節（第 200-203 行）**
 
-Remove the helper.js reference description about "JS API" — the API is now minimal. Keep the path reference:
+移除 helper.js 的「JS API」描述，保留路徑參照：
 
 ```markdown
 ## Reference
@@ -475,7 +475,7 @@ Remove the helper.js reference description about "JS API" — the API is now min
 - Helper script (client-side): `${CLAUDE_PLUGIN_ROOT}/lib/brainstorm-server/helper.js`
 ```
 
-- [ ] **Step 7: Commit**
+- [ ] **步驟 7：提交**
 
 ```bash
 git add skills/brainstorming/visual-companion.md
@@ -484,38 +484,38 @@ git commit -m "Rewrite visual-companion.md for non-blocking browser-displays-ter
 
 ---
 
-### Task 7: Final verification
+### 任務 7：最終驗證
 
-- [ ] **Step 1: Run full test suite**
+- [ ] **步驟 1：執行完整測試套件**
 
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && node tests/brainstorm-server/server.test.js
 ```
-Expected: ALL tests PASS.
+預期：所有測試通過。
 
-- [ ] **Step 2: Manual smoke test**
+- [ ] **步驟 2：手動煙霧測試**
 
-Start the server manually and verify the flow works end-to-end:
+手動啟動伺服器並確認流程端到端正常：
 
 ```bash
 cd /Users/drewritter/prime-rad/superpowers && lib/brainstorm-server/start-server.sh --project-dir /tmp/brainstorm-smoke-test
 ```
 
-Write a test fragment, open in browser, click an option, verify `.events` file is written, verify indicator bar updates. Then stop the server:
+寫入測試片段、在瀏覽器開啟、點擊選項，確認 `.events` 寫入並確認指示器列更新。然後停止伺服器：
 
 ```bash
 lib/brainstorm-server/stop-server.sh <screen_dir from start output>
 ```
 
-- [ ] **Step 3: Verify no stale references remain**
+- [ ] **步驟 3：確認沒有殘留參照**
 
 ```bash
 grep -r "wait-for-feedback\|sendToClaude\|feedback-footer\|send-to-claude\|TaskOutput.*block.*true" /Users/drewritter/prime-rad/superpowers/ --include="*.js" --include="*.md" --include="*.sh" --include="*.html" | grep -v node_modules | grep -v RELEASE-NOTES | grep -v "\.md:.*spec\|plan"
 ```
 
-Expected: No hits outside of release notes and the spec/plan docs (which are historical).
+預期：除了 release notes 與 spec/plan 文件（歷史）外沒有任何結果。
 
-- [ ] **Step 4: Final commit if any cleanup needed**
+- [ ] **步驟 4：如有需要進行最終提交**
 
 ```bash
 git status

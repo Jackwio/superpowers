@@ -1,33 +1,33 @@
-# Skill authoring best practices
+# 技能撰寫最佳實務
 
-> Learn how to write effective Skills that Claude can discover and use successfully.
+> 學習如何撰寫 Claude 能成功發現並使用的有效技能。
 
-Good Skills are concise, well-structured, and tested with real usage. This guide provides practical authoring decisions to help you write Skills that Claude can discover and use effectively.
+好的技能應該精簡、結構清楚，並經過真實使用測試。本指南提供實用的撰寫決策，幫助你寫出 Claude 能有效發現並使用的技能。
 
-For conceptual background on how Skills work, see the [Skills overview](/en/docs/agents-and-tools/agent-skills/overview).
+關於技能運作的概念背景，請見 [技能概覽](/en/docs/agents-and-tools/agent-skills/overview)。
 
-## Core principles
+## 核心原則
 
-### Concise is key
+### 精簡是關鍵
 
-The [context window](https://platform.claude.com/docs/en/build-with-claude/context-windows) is a public good. Your Skill shares the context window with everything else Claude needs to know, including:
+[context window](https://platform.claude.com/docs/en/build-with-claude/context-windows) 是公共資源。你的技能與 Claude 需要知道的其他內容共享 context window，包括：
 
-* The system prompt
-* Conversation history
-* Other Skills' metadata
-* Your actual request
+* 系統提示
+* 對話歷史
+* 其他技能的中繼資料
+* 你的實際請求
 
-Not every token in your Skill has an immediate cost. At startup, only the metadata (name and description) from all Skills is pre-loaded. Claude reads SKILL.md only when the Skill becomes relevant, and reads additional files only as needed. However, being concise in SKILL.md still matters: once Claude loads it, every token competes with conversation history and other context.
+技能中的每個 token 不一定立刻有成本。啟動時只會預載所有技能的中繼資料（name 與 description）。Claude 只有在技能變得相關時才會讀取 SKILL.md，並僅在需要時讀取其他檔案。然而，SKILL.md 的精簡仍然重要：一旦 Claude 載入它，每個 token 都要與對話歷史與其他脈絡競爭。
 
-**Default assumption**: Claude is already very smart
+**預設假設**：Claude 已經很聰明
 
-Only add context Claude doesn't already have. Challenge each piece of information:
+只加入 Claude 不會已知的資訊。對每段內容自我挑戰：
 
-* "Does Claude really need this explanation?"
-* "Can I assume Claude knows this?"
-* "Does this paragraph justify its token cost?"
+* 「Claude 真的需要這段解釋嗎？」
+* 「我能假設 Claude 已經知道嗎？」
+* 「這段文字值得它的 token 成本嗎？」
 
-**Good example: Concise** (approximately 50 tokens):
+**好例子：精簡**（約 50 tokens）：
 
 ````markdown  theme={null}
 ## Extract PDF text
@@ -42,7 +42,7 @@ with pdfplumber.open("file.pdf") as pdf:
 ```
 ````
 
-**Bad example: Too verbose** (approximately 150 tokens):
+**壞例子：太冗長**（約 150 tokens）：
 
 ```markdown  theme={null}
 ## Extract PDF text
@@ -54,21 +54,21 @@ recommend pdfplumber because it's easy to use and handles most cases well.
 First, you'll need to install it using pip. Then you can use the code below...
 ```
 
-The concise version assumes Claude knows what PDFs are and how libraries work.
+精簡版假設 Claude 知道 PDF 是什麼，也知道如何使用函式庫。
 
-### Set appropriate degrees of freedom
+### 設定適當的自由度
 
-Match the level of specificity to the task's fragility and variability.
+讓指示的具體程度匹配任務的脆弱性與變動性。
 
-**High freedom** (text-based instructions):
+**高自由度**（文字型指示）：
 
-Use when:
+適用於：
 
-* Multiple approaches are valid
-* Decisions depend on context
-* Heuristics guide the approach
+* 有多種有效作法
+* 決策取決於情境
+* 以啟發式方式引導
 
-Example:
+範例：
 
 ```markdown  theme={null}
 ## Code review process
@@ -79,15 +79,15 @@ Example:
 4. Verify adherence to project conventions
 ```
 
-**Medium freedom** (pseudocode or scripts with parameters):
+**中自由度**（偽碼或可參數化腳本）：
 
-Use when:
+適用於：
 
-* A preferred pattern exists
-* Some variation is acceptable
-* Configuration affects behavior
+* 有偏好的模式
+* 可接受部分變化
+* 設定會影響行為
 
-Example:
+範例：
 
 ````markdown  theme={null}
 ## Generate report
@@ -102,15 +102,15 @@ def generate_report(data, format="markdown", include_charts=True):
 ```
 ````
 
-**Low freedom** (specific scripts, few or no parameters):
+**低自由度**（特定腳本、少或無參數）：
 
-Use when:
+適用於：
 
-* Operations are fragile and error-prone
-* Consistency is critical
-* A specific sequence must be followed
+* 操作脆弱且容易出錯
+* 一致性很關鍵
+* 必須遵循特定順序
 
-Example:
+範例：
 
 ````markdown  theme={null}
 ## Database migration
@@ -124,39 +124,39 @@ python scripts/migrate.py --verify --backup
 Do not modify the command or add additional flags.
 ````
 
-**Analogy**: Think of Claude as a robot exploring a path:
+**比喻：**把 Claude 想成在路徑上探索的機器人：
 
-* **Narrow bridge with cliffs on both sides**: There's only one safe way forward. Provide specific guardrails and exact instructions (low freedom). Example: database migrations that must run in exact sequence.
-* **Open field with no hazards**: Many paths lead to success. Give general direction and trust Claude to find the best route (high freedom). Example: code reviews where context determines the best approach.
+* **兩側是懸崖的窄橋**：只有一條安全路徑。提供明確護欄與精準指示（低自由度）。例：必須按序執行的資料庫遷移。
+* **無危險的開闊平原**：多條路徑都能成功。給大方向，讓 Claude 找最佳路徑（高自由度）。例：需依情境決定的 code review。
 
-### Test with all models you plan to use
+### 用你計畫使用的所有模型測試
 
-Skills act as additions to models, so effectiveness depends on the underlying model. Test your Skill with all the models you plan to use it with.
+技能是加在模型上的內容，效果取決於底層模型。請用你計畫使用的所有模型測試。
 
-**Testing considerations by model**:
+**不同模型的測試考量：**
 
-* **Claude Haiku** (fast, economical): Does the Skill provide enough guidance?
-* **Claude Sonnet** (balanced): Is the Skill clear and efficient?
-* **Claude Opus** (powerful reasoning): Does the Skill avoid over-explaining?
+* **Claude Haiku**（快速、經濟）：技能提供的指引是否足夠？
+* **Claude Sonnet**（平衡）：技能是否清楚且有效率？
+* **Claude Opus**（強推理）：技能是否避免過度解釋？
 
-What works perfectly for Opus might need more detail for Haiku. If you plan to use your Skill across multiple models, aim for instructions that work well with all of them.
+對 Opus 完美的指引，對 Haiku 可能需要更多細節。若你計畫跨模型使用技能，請讓指示對所有模型都有效。
 
-## Skill structure
+## 技能結構
 
 <Note>
-  **YAML Frontmatter**: The SKILL.md frontmatter supports two fields:
+  **YAML Frontmatter**：SKILL.md frontmatter 支援兩個欄位：
 
-  * `name` - Human-readable name of the Skill (64 characters maximum)
-  * `description` - One-line description of what the Skill does and when to use it (1024 characters maximum)
+  * `name` - 技能的人類可讀名稱（最多 64 字元）
+  * `description` - 技能做什麼與何時使用的一行描述（最多 1024 字元）
 
-  For complete Skill structure details, see the [Skills overview](/en/docs/agents-and-tools/agent-skills/overview#skill-structure).
+  更完整的技能結構細節，請見 [Skills overview](/en/docs/agents-and-tools/agent-skills/overview#skill-structure)。
 </Note>
 
-### Naming conventions
+### 命名慣例
 
-Use consistent naming patterns to make Skills easier to reference and discuss. We recommend using **gerund form** (verb + -ing) for Skill names, as this clearly describes the activity or capability the Skill provides.
+使用一致的命名模式，讓技能更容易引用與討論。我們建議用**動名詞**（動詞 + -ing）作為技能名稱，因為它清楚描述技能提供的活動或能力。
 
-**Good naming examples (gerund form)**:
+**良好命名範例（動名詞）：**
 
 * "Processing PDFs"
 * "Analyzing spreadsheets"
@@ -164,61 +164,61 @@ Use consistent naming patterns to make Skills easier to reference and discuss. W
 * "Testing code"
 * "Writing documentation"
 
-**Acceptable alternatives**:
+**可接受的替代：**
 
-* Noun phrases: "PDF Processing", "Spreadsheet Analysis"
-* Action-oriented: "Process PDFs", "Analyze Spreadsheets"
+* 名詞片語："PDF Processing"、"Spreadsheet Analysis"
+* 動作導向："Process PDFs"、"Analyze Spreadsheets"
 
-**Avoid**:
+**避免：**
 
-* Vague names: "Helper", "Utils", "Tools"
-* Overly generic: "Documents", "Data", "Files"
-* Inconsistent patterns within your skill collection
+* 含糊名稱："Helper"、"Utils"、"Tools"
+* 過度泛化："Documents"、"Data"、"Files"
+* 在技能集合中使用不一致的模式
 
-Consistent naming makes it easier to:
+一致命名讓你更容易：
 
-* Reference Skills in documentation and conversations
-* Understand what a Skill does at a glance
-* Organize and search through multiple Skills
-* Maintain a professional, cohesive skill library
+* 在文件或對話中引用技能
+* 一眼理解技能用途
+* 組織與搜尋多個技能
+* 維持專業且一致的技能庫
 
-### Writing effective descriptions
+### 撰寫有效描述
 
-The `description` field enables Skill discovery and should include both what the Skill does and when to use it.
+`description` 欄位負責技能可發現性，應包含技能做什麼以及何時使用。
 
 <Warning>
-  **Always write in third person**. The description is injected into the system prompt, and inconsistent point-of-view can cause discovery problems.
+  **一定要用第三人稱**。description 會被注入系統提示，視角不一致會造成可發現性問題。
 
-  * **Good:** "Processes Excel files and generates reports"
-  * **Avoid:** "I can help you process Excel files"
-  * **Avoid:** "You can use this to process Excel files"
+  * **好：**"Processes Excel files and generates reports"
+  * **避免：**"I can help you process Excel files"
+  * **避免：**"You can use this to process Excel files"
 </Warning>
 
-**Be specific and include key terms**. Include both what the Skill does and specific triggers/contexts for when to use it.
+**請具體並包含關鍵字**。description 應包含技能做什麼，以及使用它的明確觸發條件/情境。
 
-Each Skill has exactly one description field. The description is critical for skill selection: Claude uses it to choose the right Skill from potentially 100+ available Skills. Your description must provide enough detail for Claude to know when to select this Skill, while the rest of SKILL.md provides the implementation details.
+每個技能只有一個 description。這個欄位對技能選擇至關重要：Claude 可能面對 100+ 個技能，會依 description 選出合適的技能。你的 description 必須提供足夠細節讓 Claude 知道何時選它，而 SKILL.md 的其餘內容提供實作細節。
 
-Effective examples:
+有效範例：
 
-**PDF Processing skill:**
+**PDF Processing skill：**
 
 ```yaml  theme={null}
 description: Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDF files or when the user mentions PDFs, forms, or document extraction.
 ```
 
-**Excel Analysis skill:**
+**Excel Analysis skill：**
 
 ```yaml  theme={null}
 description: Analyze Excel spreadsheets, create pivot tables, generate charts. Use when analyzing Excel files, spreadsheets, tabular data, or .xlsx files.
 ```
 
-**Git Commit Helper skill:**
+**Git Commit Helper skill：**
 
 ```yaml  theme={null}
 description: Generate descriptive commit messages by analyzing git diffs. Use when the user asks for help writing commit messages or reviewing staged changes.
 ```
 
-Avoid vague descriptions like these:
+避免以下這類模糊描述：
 
 ```yaml  theme={null}
 description: Helps with documents
@@ -232,27 +232,27 @@ description: Processes data
 description: Does stuff with files
 ```
 
-### Progressive disclosure patterns
+### 漸進揭露模式
 
-SKILL.md serves as an overview that points Claude to detailed materials as needed, like a table of contents in an onboarding guide. For an explanation of how progressive disclosure works, see [How Skills work](/en/docs/agents-and-tools/agent-skills/overview#how-skills-work) in the overview.
+SKILL.md 作為概覽，指引 Claude 在需要時前往更細的資料，就像 onboarding 指南的目錄。關於漸進揭露的說明，請見概覽中的 [How Skills work](/en/docs/agents-and-tools/agent-skills/overview#how-skills-work)。
 
-**Practical guidance:**
+**實務指引：**
 
-* Keep SKILL.md body under 500 lines for optimal performance
-* Split content into separate files when approaching this limit
-* Use the patterns below to organize instructions, code, and resources effectively
+* 為最佳效能，SKILL.md 內文保持在 500 行內
+* 接近這個限制時把內容拆到獨立檔案
+* 使用以下模式組織指示、程式碼與資源
 
-#### Visual overview: From simple to complex
+#### 視覺化概覽：由簡到繁
 
-A basic Skill starts with just a SKILL.md file containing metadata and instructions:
+基本技能只包含一個 SKILL.md，內含中繼資料與指示：
 
 <img src="https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-simple-file.png?fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=87782ff239b297d9a9e8e1b72ed72db9" alt="Simple SKILL.md file showing YAML frontmatter and markdown body" data-og-width="2048" width="2048" data-og-height="1153" height="1153" data-path="images/agent-skills-simple-file.png" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-simple-file.png?w=280&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=c61cc33b6f5855809907f7fda94cd80e 280w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-simple-file.png?w=560&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=90d2c0c1c76b36e8d485f49e0810dbfd 560w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-simple-file.png?w=840&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=ad17d231ac7b0bea7e5b4d58fb4aeabb 840w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-simple-file.png?w=1100&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=f5d0a7a3c668435bb0aee9a3a8f8c329 1100w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-simple-file.png?w=1650&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=0e927c1af9de5799cfe557d12249f6e6 1650w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-simple-file.png?w=2500&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=46bbb1a51dd4c8202a470ac8c80a893d 2500w" />
 
-As your Skill grows, you can bundle additional content that Claude loads only when needed:
+當技能成長後，可把內容打包成 Claude 只在需要時載入的額外檔案：
 
 <img src="https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-bundling-content.png?fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=a5e0aa41e3d53985a7e3e43668a33ea3" alt="Bundling additional reference files like reference.md and forms.md." data-og-width="2048" width="2048" data-og-height="1327" height="1327" data-path="images/agent-skills-bundling-content.png" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-bundling-content.png?w=280&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=f8a0e73783e99b4a643d79eac86b70a2 280w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-bundling-content.png?w=560&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=dc510a2a9d3f14359416b706f067904a 560w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-bundling-content.png?w=840&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=82cd6286c966303f7dd914c28170e385 840w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-bundling-content.png?w=1100&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=56f3be36c77e4fe4b523df209a6824c6 1100w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-bundling-content.png?w=1650&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=d22b5161b2075656417d56f41a74f3dd 1650w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-bundling-content.png?w=2500&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=3dd4bdd6850ffcc96c6c45fcb0acd6eb 2500w" />
 
-The complete Skill directory structure might look like this:
+完整技能目錄結構可能如下：
 
 ```
 pdf/
@@ -266,7 +266,7 @@ pdf/
     └── validate.py       # Validation script
 ```
 
-#### Pattern 1: High-level guide with references
+#### 模式 1：高層指南 + 參考連結
 
 ````markdown  theme={null}
 ---
@@ -292,11 +292,11 @@ with pdfplumber.open("file.pdf") as pdf:
 **Examples**: See [EXAMPLES.md](EXAMPLES.md) for common patterns
 ````
 
-Claude loads FORMS.md, REFERENCE.md, or EXAMPLES.md only when needed.
+Claude 只有在需要時才會載入 FORMS.md、REFERENCE.md 或 EXAMPLES.md。
 
-#### Pattern 2: Domain-specific organization
+#### 模式 2：領域分區組織
 
-For Skills with multiple domains, organize content by domain to avoid loading irrelevant context. When a user asks about sales metrics, Claude only needs to read sales-related schemas, not finance or marketing data. This keeps token usage low and context focused.
+對於涵蓋多個領域的技能，依領域組織內容以避免載入不相關脈絡。當使用者詢問銷售指標時，Claude 只需要讀銷售相關 schema，而不需要財務或行銷資料。這能降低 token 使用量並保持脈絡聚焦。
 
 ```
 bigquery-skill/
@@ -329,9 +329,9 @@ grep -i "api usage" reference/product.md
 ```
 ````
 
-#### Pattern 3: Conditional details
+#### 模式 3：條件式細節
 
-Show basic content, link to advanced content:
+先顯示基礎內容，連到進階內容：
 
 ```markdown  theme={null}
 # DOCX Processing
@@ -348,15 +348,15 @@ For simple edits, modify the XML directly.
 **For OOXML details**: See [OOXML.md](OOXML.md)
 ```
 
-Claude reads REDLINING.md or OOXML.md only when the user needs those features.
+只有在使用者需要這些功能時，Claude 才會讀 REDLINING.md 或 OOXML.md。
 
-### Avoid deeply nested references
+### 避免過深的巢狀參考
 
-Claude may partially read files when they're referenced from other referenced files. When encountering nested references, Claude might use commands like `head -100` to preview content rather than reading entire files, resulting in incomplete information.
+當檔案是從其他被參考的檔案再被參考時，Claude 可能只讀到部分內容。遇到巢狀參考時，Claude 可能使用 `head -100` 之類的指令預覽，而非讀完整檔案，導致資訊不完整。
 
-**Keep references one level deep from SKILL.md**. All reference files should link directly from SKILL.md to ensure Claude reads complete files when needed.
+**讓參考檔只從 SKILL.md 一層連出**。所有參考檔都應該由 SKILL.md 直接連結，以確保 Claude 在需要時讀取完整檔案。
 
-**Bad example: Too deep**:
+**壞例子：太深**：
 
 ```markdown  theme={null}
 # SKILL.md
@@ -369,7 +369,7 @@ See [details.md](details.md)...
 Here's the actual information...
 ```
 
-**Good example: One level deep**:
+**好例子：一層深**：
 
 ```markdown  theme={null}
 # SKILL.md
@@ -380,11 +380,11 @@ Here's the actual information...
 **Examples**: See [examples.md](examples.md)
 ```
 
-### Structure longer reference files with table of contents
+### 以目錄建立較長參考檔的結構
 
-For reference files longer than 100 lines, include a table of contents at the top. This ensures Claude can see the full scope of available information even when previewing with partial reads.
+若參考檔超過 100 行，請在頂部加入目錄。即使 Claude 使用部分讀取，也能看到完整資訊範圍。
 
-**Example**:
+**範例：**
 
 ```markdown  theme={null}
 # API Reference
@@ -403,17 +403,17 @@ For reference files longer than 100 lines, include a table of contents at the to
 ...
 ```
 
-Claude can then read the complete file or jump to specific sections as needed.
+Claude 之後可以讀完整檔案，或直接跳到特定章節。
 
-For details on how this filesystem-based architecture enables progressive disclosure, see the [Runtime environment](#runtime-environment) section in the Advanced section below.
+關於這種檔案系統架構如何支持漸進揭露的更多細節，請見下方進階章節的 [Runtime environment](#runtime-environment)。
 
-## Workflows and feedback loops
+## 工作流程與回饋迴圈
 
-### Use workflows for complex tasks
+### 為複雜任務使用工作流程
 
-Break complex operations into clear, sequential steps. For particularly complex workflows, provide a checklist that Claude can copy into its response and check off as it progresses.
+把複雜操作拆成清楚的序列步驟。對特別複雜的流程，提供可讓 Claude 複製的檢查清單，並在回應中逐項勾選。
 
-**Example 1: Research synthesis workflow** (for Skills without code):
+**範例 1：研究彙整流程**（無程式碼的技能）：
 
 ````markdown  theme={null}
 ## Research synthesis workflow
@@ -453,9 +453,9 @@ Organize findings by theme. Include:
 Check that every claim references the correct source document. If citations are incomplete, return to Step 3.
 ````
 
-This example shows how workflows apply to analysis tasks that don't require code. The checklist pattern works for any complex, multi-step process.
+此例展示了工作流程如何用於不需要寫程式碼的分析任務。清單模式適用於任何複雜、多步驟流程。
 
-**Example 2: PDF form filling workflow** (for Skills with code):
+**範例 2：PDF 表單填寫流程**（有程式碼的技能）：
 
 ````markdown  theme={null}
 ## PDF form filling workflow
@@ -498,15 +498,15 @@ Run: `python scripts/verify_output.py output.pdf`
 If verification fails, return to Step 2.
 ````
 
-Clear steps prevent Claude from skipping critical validation. The checklist helps both Claude and you track progress through multi-step workflows.
+清楚的步驟可避免 Claude 跳過關鍵驗證。清單可讓 Claude 與你一起追蹤進度。
 
-### Implement feedback loops
+### 實作回饋迴圈
 
-**Common pattern**: Run validator → fix errors → repeat
+**常見模式**：執行驗證器 → 修正錯誤 → 重複
 
-This pattern greatly improves output quality.
+這種模式能大幅提升輸出品質。
 
-**Example 1: Style guide compliance** (for Skills without code):
+**範例 1：風格指南合規**（無程式碼的技能）：
 
 ```markdown  theme={null}
 ## Content review process
@@ -524,9 +524,9 @@ This pattern greatly improves output quality.
 5. Finalize and save the document
 ```
 
-This shows the validation loop pattern using reference documents instead of scripts. The "validator" is STYLE\_GUIDE.md, and Claude performs the check by reading and comparing.
+這展示了用參考文件（而不是腳本）實作驗證迴圈。「驗證器」是 STYLE_GUIDE.md，Claude 透過閱讀與比對進行檢查。
 
-**Example 2: Document editing process** (for Skills with code):
+**範例 2：文件編輯流程**（有程式碼的技能）：
 
 ```markdown  theme={null}
 ## Document editing process
@@ -542,22 +542,22 @@ This shows the validation loop pattern using reference documents instead of scri
 6. Test the output document
 ```
 
-The validation loop catches errors early.
+驗證迴圈能早期抓到錯誤。
 
-## Content guidelines
+## 內容指引
 
-### Avoid time-sensitive information
+### 避免時間敏感資訊
 
-Don't include information that will become outdated:
+不要加入會過時的資訊：
 
-**Bad example: Time-sensitive** (will become wrong):
+**壞例子：時間敏感**（會變錯）：
 
 ```markdown  theme={null}
 If you're doing this before August 2025, use the old API.
 After August 2025, use the new API.
 ```
 
-**Good example** (use "old patterns" section):
+**好例子**（使用「舊模式」段落）：
 
 ```markdown  theme={null}
 ## Current method
@@ -575,33 +575,33 @@ This endpoint is no longer supported.
 </details>
 ```
 
-The old patterns section provides historical context without cluttering the main content.
+「舊模式」段落提供歷史脈絡，但不會干擾主要內容。
 
-### Use consistent terminology
+### 使用一致術語
 
-Choose one term and use it throughout the Skill:
+選定一個術語並在整個技能中一致使用：
 
-**Good - Consistent**:
+**好 — 一致：**
 
 * Always "API endpoint"
 * Always "field"
 * Always "extract"
 
-**Bad - Inconsistent**:
+**壞 — 不一致：**
 
-* Mix "API endpoint", "URL", "API route", "path"
-* Mix "field", "box", "element", "control"
-* Mix "extract", "pull", "get", "retrieve"
+* 混用 "API endpoint"、"URL"、"API route"、"path"
+* 混用 "field"、"box"、"element"、"control"
+* 混用 "extract"、"pull"、"get"、"retrieve"
 
-Consistency helps Claude understand and follow instructions.
+一致性有助於 Claude 理解並遵循指示。
 
-## Common patterns
+## 常見模式
 
-### Template pattern
+### 模板模式
 
-Provide templates for output format. Match the level of strictness to your needs.
+提供輸出格式模板。依需求調整嚴格程度。
 
-**For strict requirements** (like API responses or data formats):
+**對嚴格需求**（如 API 回應或資料格式）：
 
 ````markdown  theme={null}
 ## Report structure
@@ -625,7 +625,7 @@ ALWAYS use this exact template structure:
 ```
 ````
 
-**For flexible guidance** (when adaptation is useful):
+**對彈性指引**（可調整時）：
 
 ````markdown  theme={null}
 ## Report structure
@@ -648,9 +648,9 @@ Here is a sensible default format, but use your best judgment based on the analy
 Adjust sections as needed for the specific analysis type.
 ````
 
-### Examples pattern
+### 範例模式
 
-For Skills where output quality depends on seeing examples, provide input/output pairs just like in regular prompting:
+當輸出品質取決於範例時，提供與一般 prompting 相同的輸入/輸出對：
 
 ````markdown  theme={null}
 ## Commit message format
@@ -688,11 +688,11 @@ chore: update dependencies and refactor error handling
 Follow this style: type(scope): brief description, then detailed explanation.
 ````
 
-Examples help Claude understand the desired style and level of detail more clearly than descriptions alone.
+範例能比描述更清楚地讓 Claude 理解期待的風格與細節程度。
 
-### Conditional workflow pattern
+### 條件式流程模式
 
-Guide Claude through decision points:
+引導 Claude 走決策點：
 
 ```markdown  theme={null}
 ## Document modification workflow
@@ -715,26 +715,26 @@ Guide Claude through decision points:
 ```
 
 <Tip>
-  If workflows become large or complicated with many steps, consider pushing them into separate files and tell Claude to read the appropriate file based on the task at hand.
+  如果流程步驟很多且複雜，考慮移到獨立檔案，並指示 Claude 依任務閱讀對應檔案。
 </Tip>
 
-## Evaluation and iteration
+## 評估與迭代
 
-### Build evaluations first
+### 先建立評估
 
-**Create evaluations BEFORE writing extensive documentation.** This ensures your Skill solves real problems rather than documenting imagined ones.
+**在撰寫大量文件之前，先建立評估。**這能確保你的技能解決真實問題，而不是記錄想像中的需求。
 
-**Evaluation-driven development:**
+**評估驅動開發：**
 
-1. **Identify gaps**: Run Claude on representative tasks without a Skill. Document specific failures or missing context
-2. **Create evaluations**: Build three scenarios that test these gaps
-3. **Establish baseline**: Measure Claude's performance without the Skill
-4. **Write minimal instructions**: Create just enough content to address the gaps and pass evaluations
-5. **Iterate**: Execute evaluations, compare against baseline, and refine
+1. **找出缺口**：在沒有技能下跑 Claude 的代表性任務，記錄具體失敗或缺少的脈絡
+2. **建立評估**：設計三個測試這些缺口的情境
+3. **建立基線**：衡量沒有技能時的表現
+4. **寫最小指引**：只寫足以補上缺口並通過評估的內容
+5. **迭代**：執行評估、與基線比較並修正
 
-This approach ensures you're solving actual problems rather than anticipating requirements that may never materialize.
+此方法可確保你解決的是實際問題，而不是預期中永遠不會出現的需求。
 
-**Evaluation structure**:
+**評估結構：**
 
 ```json  theme={null}
 {
@@ -750,90 +750,90 @@ This approach ensures you're solving actual problems rather than anticipating re
 ```
 
 <Note>
-  This example demonstrates a data-driven evaluation with a simple testing rubric. We do not currently provide a built-in way to run these evaluations. Users can create their own evaluation system. Evaluations are your source of truth for measuring Skill effectiveness.
+  這個範例展示了資料驅動評估與簡單的測試規範。我們目前沒有內建執行這些評估的方式。使用者可自行建立評估系統。評估是衡量技能效果的真實依據。
 </Note>
 
-### Develop Skills iteratively with Claude
+### 用 Claude 迭代開發技能
 
-The most effective Skill development process involves Claude itself. Work with one instance of Claude ("Claude A") to create a Skill that will be used by other instances ("Claude B"). Claude A helps you design and refine instructions, while Claude B tests them in real tasks. This works because Claude models understand both how to write effective agent instructions and what information agents need.
+最有效的技能開發流程包含 Claude 本身。用一個 Claude 實例（"Claude A"）建立技能，供另一個實例（"Claude B"）使用。Claude A 協助你設計與精煉指示，Claude B 在實際任務中測試。這有效是因為 Claude 模型理解如何撰寫有效的代理指示，也理解代理需要哪些資訊。
 
-**Creating a new Skill:**
+**建立新技能：**
 
-1. **Complete a task without a Skill**: Work through a problem with Claude A using normal prompting. As you work, you'll naturally provide context, explain preferences, and share procedural knowledge. Notice what information you repeatedly provide.
+1. **在沒有技能下完成任務**：使用 Claude A 以一般 prompting 完成任務。過程中你會自然提供脈絡、偏好與流程知識。注意你反覆提供的資訊。
 
-2. **Identify the reusable pattern**: After completing the task, identify what context you provided that would be useful for similar future tasks.
+2. **找出可重用模式**：完成任務後，找出哪些脈絡適合用於未來相似任務。
 
-   **Example**: If you worked through a BigQuery analysis, you might have provided table names, field definitions, filtering rules (like "always exclude test accounts"), and common query patterns.
+   **例子**：若你做的是 BigQuery 分析，你可能提供了表名稱、欄位定義、過濾規則（如「永遠排除測試帳戶」）與常見查詢模式。
 
-3. **Ask Claude A to create a Skill**: "Create a Skill that captures this BigQuery analysis pattern we just used. Include the table schemas, naming conventions, and the rule about filtering test accounts."
+3. **請 Claude A 建立技能**：「建立一個 Skill，捕捉我們剛才使用的 BigQuery 分析模式，包含表格 schema、命名慣例與排除測試帳戶的規則。」
 
    <Tip>
-     Claude models understand the Skill format and structure natively. You don't need special system prompts or a "writing skills" skill to get Claude to help create Skills. Simply ask Claude to create a Skill and it will generate properly structured SKILL.md content with appropriate frontmatter and body content.
+     Claude 模型原生理解技能格式與結構。不需要特殊系統提示或「writing skills」技能就能讓 Claude 協助建立技能。只要請 Claude 建立技能，它就會產生結構正確的 SKILL.md（含 frontmatter 與正文）。
    </Tip>
 
-4. **Review for conciseness**: Check that Claude A hasn't added unnecessary explanations. Ask: "Remove the explanation about what win rate means - Claude already knows that."
+4. **檢查精簡度**：確認 Claude A 沒加多餘解釋。可以說：「刪掉 win rate 的解釋 — Claude 已經知道。」
 
-5. **Improve information architecture**: Ask Claude A to organize the content more effectively. For example: "Organize this so the table schema is in a separate reference file. We might add more tables later."
+5. **改善資訊架構**：請 Claude A 更有效地組織內容，例如：「把表格 schema 放到獨立參考檔。我們可能會新增更多表。」
 
-6. **Test on similar tasks**: Use the Skill with Claude B (a fresh instance with the Skill loaded) on related use cases. Observe whether Claude B finds the right information, applies rules correctly, and handles the task successfully.
+6. **在相似任務中測試**：用 Claude B（載入技能的全新實例）跑相關使用情境，觀察 Claude B 是否找到正確資訊、正確套用規則並完成任務。
 
-7. **Iterate based on observation**: If Claude B struggles or misses something, return to Claude A with specifics: "When Claude used this Skill, it forgot to filter by date for Q4. Should we add a section about date filtering patterns?"
+7. **依觀察迭代**：若 Claude B 卡住或漏掉內容，回到 Claude A 並提供具體觀察：「Claude 用這個技能時忘了 Q4 的日期過濾。我們要加一段日期過濾模式嗎？」
 
-**Iterating on existing Skills:**
+**迭代既有技能：**
 
-The same hierarchical pattern continues when improving Skills. You alternate between:
+改善技能時同樣遵循這個分工模式：
 
-* **Working with Claude A** (the expert who helps refine the Skill)
-* **Testing with Claude B** (the agent using the Skill to perform real work)
-* **Observing Claude B's behavior** and bringing insights back to Claude A
+* **與 Claude A 合作**（協助精煉技能）
+* **用 Claude B 測試**（在真實工作中使用）
+* **觀察 Claude B 行為**並把洞見帶回 Claude A
 
-1. **Use the Skill in real workflows**: Give Claude B (with the Skill loaded) actual tasks, not test scenarios
+1. **在真實流程中使用技能**：給 Claude B（載入技能）真實任務，而非測試情境
 
-2. **Observe Claude B's behavior**: Note where it struggles, succeeds, or makes unexpected choices
+2. **觀察 Claude B 行為**：記下它卡住、成功或做出意外選擇的地方
 
-   **Example observation**: "When I asked Claude B for a regional sales report, it wrote the query but forgot to filter out test accounts, even though the Skill mentions this rule."
+   **觀察例子**：「我請 Claude B 做區域銷售報表時，它寫了查詢，但忘了排除測試帳戶，雖然技能有說這條規則。」
 
-3. **Return to Claude A for improvements**: Share the current SKILL.md and describe what you observed. Ask: "I noticed Claude B forgot to filter test accounts when I asked for a regional report. The Skill mentions filtering, but maybe it's not prominent enough?"
+3. **回到 Claude A 改善**：分享目前的 SKILL.md 與你的觀察，並詢問：「Claude B 做區域報表時忘了排除測試帳戶。技能有提，但可能不夠顯眼？」
 
-4. **Review Claude A's suggestions**: Claude A might suggest reorganizing to make rules more prominent, using stronger language like "MUST filter" instead of "always filter", or restructuring the workflow section.
+4. **檢視 Claude A 的建議**：Claude A 可能建議重排結構讓規則更顯眼，改用更強語氣（"MUST filter" 取代 "always filter"），或重寫流程段落。
 
-5. **Apply and test changes**: Update the Skill with Claude A's refinements, then test again with Claude B on similar requests
+5. **套用並測試**：用 Claude A 的修正更新技能，再讓 Claude B 用相似請求測試
 
-6. **Repeat based on usage**: Continue this observe-refine-test cycle as you encounter new scenarios. Each iteration improves the Skill based on real agent behavior, not assumptions.
+6. **根據使用重複**：持續這個觀察-修正-測試的循環。每次迭代都基於真實行為而不是假設。
 
-**Gathering team feedback:**
+**蒐集團隊回饋：**
 
-1. Share Skills with teammates and observe their usage
-2. Ask: Does the Skill activate when expected? Are instructions clear? What's missing?
-3. Incorporate feedback to address blind spots in your own usage patterns
+1. 與隊友分享技能並觀察使用情況
+2. 詢問：技能是否在預期情境被觸發？指示是否清楚？缺了什麼？
+3. 納入回饋，修補你自身使用模式的盲點
 
-**Why this approach works**: Claude A understands agent needs, you provide domain expertise, Claude B reveals gaps through real usage, and iterative refinement improves Skills based on observed behavior rather than assumptions.
+**為何此方法有效**：Claude A 理解代理需求，你提供領域專長，Claude B 透過真實使用揭露缺口，而迭代式修正能依觀察行為改善技能，而非建立在假設上。
 
-### Observe how Claude navigates Skills
+### 觀察 Claude 如何導覽技能
 
-As you iterate on Skills, pay attention to how Claude actually uses them in practice. Watch for:
+在迭代技能時，注意 Claude 實際如何使用它們。觀察：
 
-* **Unexpected exploration paths**: Does Claude read files in an order you didn't anticipate? This might indicate your structure isn't as intuitive as you thought
-* **Missed connections**: Does Claude fail to follow references to important files? Your links might need to be more explicit or prominent
-* **Overreliance on certain sections**: If Claude repeatedly reads the same file, consider whether that content should be in the main SKILL.md instead
-* **Ignored content**: If Claude never accesses a bundled file, it might be unnecessary or poorly signaled in the main instructions
+* **非預期的探索路徑**：Claude 是否以你未預期的順序讀檔？可能表示結構不如你想像直覺
+* **遺漏連結**：Claude 是否沒跟到重要檔案的引用？連結可能需要更明確或更顯眼
+* **過度依賴某段內容**：若 Claude 反覆讀同一檔案，可能該內容應該放在主 SKILL.md
+* **被忽略的內容**：若 Claude 從不讀某個打包檔，可能是不必要或在主指示中不夠明顯
 
-Iterate based on these observations rather than assumptions. The 'name' and 'description' in your Skill's metadata are particularly critical. Claude uses these when deciding whether to trigger the Skill in response to the current task. Make sure they clearly describe what the Skill does and when it should be used.
+依觀察而非假設迭代。技能的中繼資料中的 `name` 與 `description` 尤其關鍵。Claude 會用它們判斷是否觸發技能。請確保它們清楚描述技能做什麼，以及何時使用。
 
-## Anti-patterns to avoid
+## 需避免的反模式
 
-### Avoid Windows-style paths
+### 避免 Windows 風格路徑
 
-Always use forward slashes in file paths, even on Windows:
+即使在 Windows，也永遠使用正斜線：
 
-* ✓ **Good**: `scripts/helper.py`, `reference/guide.md`
-* ✗ **Avoid**: `scripts\helper.py`, `reference\guide.md`
+* ✓ **好**：`scripts/helper.py`, `reference/guide.md`
+* ✗ **避免**：`scripts\helper.py`, `reference\guide.md`
 
-Unix-style paths work across all platforms, while Windows-style paths cause errors on Unix systems.
+Unix 風格路徑可跨平台使用；Windows 風格會在 Unix 系統出錯。
 
-### Avoid offering too many options
+### 避免提供過多選項
 
-Don't present multiple approaches unless necessary:
+除非必要，不要提供多個作法：
 
 ````markdown  theme={null}
 **Bad example: Too many choices** (confusing):
@@ -848,15 +848,15 @@ import pdfplumber
 For scanned PDFs requiring OCR, use pdf2image with pytesseract instead."
 ````
 
-## Advanced: Skills with executable code
+## 進階：含可執行程式碼的技能
 
-The sections below focus on Skills that include executable scripts. If your Skill uses only markdown instructions, skip to [Checklist for effective Skills](#checklist-for-effective-skills).
+以下章節針對包含可執行腳本的技能。若你的技能只有 markdown 指示，請跳到 [有效技能檢查表](#checklist-for-effective-skills)。
 
-### Solve, don't punt
+### 直接解決，不要推給 Claude
 
-When writing scripts for Skills, handle error conditions rather than punting to Claude.
+撰寫技能的腳本時，請處理錯誤狀況，不要把問題丟給 Claude。
 
-**Good example: Handle errors explicitly**:
+**好例子：明確處理錯誤**：
 
 ```python  theme={null}
 def process_file(path):
@@ -876,7 +876,7 @@ def process_file(path):
         return ''
 ```
 
-**Bad example: Punt to Claude**:
+**壞例子：丟給 Claude**：
 
 ```python  theme={null}
 def process_file(path):
@@ -884,9 +884,9 @@ def process_file(path):
     return open(path).read()
 ```
 
-Configuration parameters should also be justified and documented to avoid "voodoo constants" (Ousterhout's law). If you don't know the right value, how will Claude determine it?
+設定參數也應該有理由並被文件化，以避免「巫毒常數」（Ousterhout 定律）。如果你不知道正確值，Claude 要怎麼判斷？
 
-**Good example: Self-documenting**:
+**好例子：自我文件化**：
 
 ```python  theme={null}
 # HTTP requests typically complete within 30 seconds
@@ -898,36 +898,36 @@ REQUEST_TIMEOUT = 30
 MAX_RETRIES = 3
 ```
 
-**Bad example: Magic numbers**:
+**壞例子：Magic numbers**：
 
 ```python  theme={null}
 TIMEOUT = 47  # Why 47?
 RETRIES = 5   # Why 5?
 ```
 
-### Provide utility scripts
+### 提供工具腳本
 
-Even if Claude could write a script, pre-made scripts offer advantages:
+即使 Claude 能自己寫腳本，預先提供的腳本仍有優勢：
 
-**Benefits of utility scripts**:
+**工具腳本的好處：**
 
-* More reliable than generated code
-* Save tokens (no need to include code in context)
-* Save time (no code generation required)
-* Ensure consistency across uses
+* 比生成式程式碼更可靠
+* 節省 token（不必把程式碼放進脈絡）
+* 節省時間（不需生成程式碼）
+* 確保跨使用的一致性
 
 <img src="https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-executable-scripts.png?fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=4bbc45f2c2e0bee9f2f0d5da669bad00" alt="Bundling executable scripts alongside instruction files" data-og-width="2048" width="2048" data-og-height="1154" height="1154" data-path="images/agent-skills-executable-scripts.png" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-executable-scripts.png?w=280&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=9a04e6535a8467bfeea492e517de389f 280w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-executable-scripts.png?w=560&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=e49333ad90141af17c0d7651cca7216b 560w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-executable-scripts.png?w=840&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=954265a5df52223d6572b6214168c428 840w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-executable-scripts.png?w=1100&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=2ff7a2d8f2a83ee8af132b29f10150fd 1100w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-executable-scripts.png?w=1650&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=48ab96245e04077f4d15e9170e081cfb 1650w, https://mintcdn.com/anthropic-claude-docs/4Bny2bjzuGBK7o00/images/agent-skills-executable-scripts.png?w=2500&fit=max&auto=format&n=4Bny2bjzuGBK7o00&q=85&s=0301a6c8b3ee879497cc5b5483177c90 2500w" />
 
-The diagram above shows how executable scripts work alongside instruction files. The instruction file (forms.md) references the script, and Claude can execute it without loading its contents into context.
+上圖顯示可執行腳本如何與指示檔共存。指示檔（forms.md）引用腳本，Claude 可以執行它而不必把內容載入脈絡。
 
-**Important distinction**: Make clear in your instructions whether Claude should:
+**重要區分**：在指示中要清楚說明 Claude 應該：
 
-* **Execute the script** (most common): "Run `analyze_form.py` to extract fields"
-* **Read it as reference** (for complex logic): "See `analyze_form.py` for the field extraction algorithm"
+* **執行腳本**（最常見）："Run `analyze_form.py` to extract fields"
+* **讀取作為參考**（較複雜邏輯）："See `analyze_form.py` for the field extraction algorithm"
 
-For most utility scripts, execution is preferred because it's more reliable and efficient. See the [Runtime environment](#runtime-environment) section below for details on how script execution works.
+對多數工具腳本，執行更可靠也更高效。腳本執行的細節請見下方 [Runtime environment](#runtime-environment)。
 
-**Example**:
+**範例：**
 
 ````markdown  theme={null}
 ## Utility scripts
@@ -960,9 +960,9 @@ python scripts/fill_form.py input.pdf fields.json output.pdf
 ```
 ````
 
-### Use visual analysis
+### 使用視覺分析
 
-When inputs can be rendered as images, have Claude analyze them:
+當輸入可以渲染為圖片時，讓 Claude 進行視覺分析：
 
 ````markdown  theme={null}
 ## Form layout analysis
@@ -977,65 +977,65 @@ When inputs can be rendered as images, have Claude analyze them:
 ````
 
 <Note>
-  In this example, you'd need to write the `pdf_to_images.py` script.
+  在此例中，你需要撰寫 `pdf_to_images.py` 腳本。
 </Note>
 
-Claude's vision capabilities help understand layouts and structures.
+Claude 的視覺能力有助於理解版面與結構。
 
-### Create verifiable intermediate outputs
+### 建立可驗證的中間產物
 
-When Claude performs complex, open-ended tasks, it can make mistakes. The "plan-validate-execute" pattern catches errors early by having Claude first create a plan in a structured format, then validate that plan with a script before executing it.
+當 Claude 執行複雜、開放式任務時，可能會犯錯。「plan-validate-execute」模式可讓 Claude 先建立結構化計畫，再用腳本驗證，最後執行，藉此提早抓錯。
 
-**Example**: Imagine asking Claude to update 50 form fields in a PDF based on a spreadsheet. Without validation, Claude might reference non-existent fields, create conflicting values, miss required fields, or apply updates incorrectly.
+**範例**：假設你要 Claude 依試算表更新 PDF 裡 50 個欄位。若沒有驗證，Claude 可能會引用不存在的欄位、產生衝突值、漏掉必填欄位，或套用錯誤更新。
 
-**Solution**: Use the workflow pattern shown above (PDF form filling), but add an intermediate `changes.json` file that gets validated before applying changes. The workflow becomes: analyze → **create plan file** → **validate plan** → execute → verify.
+**解法**：使用上面的流程模式（PDF 表單填寫），但加入中間的 `changes.json` 檔，在套用變更前先驗證。流程變成：分析 → **建立計畫檔** → **驗證計畫** → 執行 → 驗證。
 
-**Why this pattern works:**
+**為何有效：**
 
-* **Catches errors early**: Validation finds problems before changes are applied
-* **Machine-verifiable**: Scripts provide objective verification
-* **Reversible planning**: Claude can iterate on the plan without touching originals
-* **Clear debugging**: Error messages point to specific problems
+* **早期抓錯**：驗證在變更套用前就能發現問題
+* **可機器驗證**：腳本提供客觀驗證
+* **可逆規劃**：Claude 可在不動原檔的情況下反覆修正計畫
+* **清楚除錯**：錯誤訊息指向具體問題
 
-**When to use**: Batch operations, destructive changes, complex validation rules, high-stakes operations.
+**適用時機**：批次操作、破壞性變更、複雜驗證規則、高風險操作。
 
-**Implementation tip**: Make validation scripts verbose with specific error messages like "Field 'signature\_date' not found. Available fields: customer\_name, order\_total, signature\_date\_signed" to help Claude fix issues.
+**實作提示**：驗證腳本應提供具體錯誤訊息，例如「Field 'signature_date' not found. Available fields: customer_name, order_total, signature_date_signed」，以便 Claude 修正。
 
-### Package dependencies
+### 套件依賴
 
-Skills run in the code execution environment with platform-specific limitations:
+技能在程式碼執行環境中運作，依平台而異：
 
-* **claude.ai**: Can install packages from npm and PyPI and pull from GitHub repositories
-* **Anthropic API**: Has no network access and no runtime package installation
+* **claude.ai**：可從 npm 與 PyPI 安裝套件，也可從 GitHub 取得
+* **Anthropic API**：無網路存取，也無法於執行時安裝套件
 
-List required packages in your SKILL.md and verify they're available in the [code execution tool documentation](/en/docs/agents-and-tools/tool-use/code-execution-tool).
+請在 SKILL.md 列出需要的套件，並在 [程式碼執行工具文件](/en/docs/agents-and-tools/tool-use/code-execution-tool) 中確認可用性。
 
-### Runtime environment
+### 執行環境
 
-Skills run in a code execution environment with filesystem access, bash commands, and code execution capabilities. For the conceptual explanation of this architecture, see [The Skills architecture](/en/docs/agents-and-tools/agent-skills/overview#the-skills-architecture) in the overview.
+技能在可存取檔案系統、支援 bash 與程式執行的環境中運作。關於這種架構的概念說明，請見概覽中的 [The Skills architecture](/en/docs/agents-and-tools/agent-skills/overview#the-skills-architecture)。
 
-**How this affects your authoring:**
+**對撰寫的影響：**
 
-**How Claude accesses Skills:**
+**Claude 如何存取技能：**
 
-1. **Metadata pre-loaded**: At startup, the name and description from all Skills' YAML frontmatter are loaded into the system prompt
-2. **Files read on-demand**: Claude uses bash Read tools to access SKILL.md and other files from the filesystem when needed
-3. **Scripts executed efficiently**: Utility scripts can be executed via bash without loading their full contents into context. Only the script's output consumes tokens
-4. **No context penalty for large files**: Reference files, data, or documentation don't consume context tokens until actually read
+1. **中繼資料預載**：啟動時會將所有技能 YAML frontmatter 的 name 與 description 載入系統提示
+2. **按需讀檔**：Claude 透過 bash Read 工具在需要時讀取 SKILL.md 與其他檔案
+3. **腳本可直接執行**：工具腳本可透過 bash 執行，無需把內容載入脈絡。只有腳本輸出會消耗 token
+4. **大型檔案無脈絡成本**：參考檔、資料或文件只有在讀取時才消耗 token
 
-* **File paths matter**: Claude navigates your skill directory like a filesystem. Use forward slashes (`reference/guide.md`), not backslashes
-* **Name files descriptively**: Use names that indicate content: `form_validation_rules.md`, not `doc2.md`
-* **Organize for discovery**: Structure directories by domain or feature
-  * Good: `reference/finance.md`, `reference/sales.md`
-  * Bad: `docs/file1.md`, `docs/file2.md`
-* **Bundle comprehensive resources**: Include complete API docs, extensive examples, large datasets; no context penalty until accessed
-* **Prefer scripts for deterministic operations**: Write `validate_form.py` rather than asking Claude to generate validation code
-* **Make execution intent clear**:
-  * "Run `analyze_form.py` to extract fields" (execute)
-  * "See `analyze_form.py` for the extraction algorithm" (read as reference)
-* **Test file access patterns**: Verify Claude can navigate your directory structure by testing with real requests
+* **檔案路徑很重要**：Claude 以檔案系統導覽技能目錄。使用正斜線（`reference/guide.md`），不要用反斜線
+* **檔名要有意義**：使用能表達內容的名稱：`form_validation_rules.md`，不要用 `doc2.md`
+* **以可發現性組織**：依領域或功能組織目錄
+  * 好：`reference/finance.md`、`reference/sales.md`
+  * 壞：`docs/file1.md`、`docs/file2.md`
+* **打包完整資源**：包含完整 API 文件、豐富範例、大型資料集；未存取前無脈絡成本
+* **偏好腳本處理可決定性操作**：寫 `validate_form.py`，不要要求 Claude 生成驗證程式
+* **清楚標示執行意圖**：
+  * "Run `analyze_form.py` to extract fields"（執行）
+  * "See `analyze_form.py` for the extraction algorithm"（作為參考閱讀）
+* **測試檔案存取路徑**：用真實請求驗證 Claude 能否導覽你的目錄結構
 
-**Example:**
+**範例：**
 
 ```
 bigquery-skill/
@@ -1046,33 +1046,33 @@ bigquery-skill/
     └── product.md (usage analytics)
 ```
 
-When the user asks about revenue, Claude reads SKILL.md, sees the reference to `reference/finance.md`, and invokes bash to read just that file. The sales.md and product.md files remain on the filesystem, consuming zero context tokens until needed. This filesystem-based model is what enables progressive disclosure. Claude can navigate and selectively load exactly what each task requires.
+當使用者詢問營收時，Claude 會讀 SKILL.md，看到 `reference/finance.md`，並用 bash 讀該檔案。sales.md 與 product.md 仍保留在檔案系統中，不會消耗任何脈絡 token。這種基於檔案系統的模型使漸進揭露得以成立。Claude 可導航並選擇性載入每個任務所需內容。
 
-For complete details on the technical architecture, see [How Skills work](/en/docs/agents-and-tools/agent-skills/overview#how-skills-work) in the Skills overview.
+完整技術架構細節，請見 Skills 概覽中的 [How Skills work](/en/docs/agents-and-tools/agent-skills/overview#how-skills-work)。
 
-### MCP tool references
+### MCP 工具引用
 
-If your Skill uses MCP (Model Context Protocol) tools, always use fully qualified tool names to avoid "tool not found" errors.
+若你的技能使用 MCP（Model Context Protocol）工具，務必使用完整限定名稱，避免「tool not found」錯誤。
 
-**Format**: `ServerName:tool_name`
+**格式**：`ServerName:tool_name`
 
-**Example**:
+**範例**：
 
 ```markdown  theme={null}
 Use the BigQuery:bigquery_schema tool to retrieve table schemas.
 Use the GitHub:create_issue tool to create issues.
 ```
 
-Where:
+其中：
 
-* `BigQuery` and `GitHub` are MCP server names
-* `bigquery_schema` and `create_issue` are the tool names within those servers
+* `BigQuery` 與 `GitHub` 是 MCP server 名稱
+* `bigquery_schema` 與 `create_issue` 是伺服器內的工具名稱
 
-Without the server prefix, Claude may fail to locate the tool, especially when multiple MCP servers are available.
+沒有 server 前綴時，Claude 可能找不到工具，尤其是有多個 MCP server 可用時。
 
-### Avoid assuming tools are installed
+### 避免假設工具已安裝
 
-Don't assume packages are available:
+不要假設套件可用：
 
 ````markdown  theme={null}
 **Bad example: Assumes installation**:
@@ -1088,52 +1088,52 @@ reader = PdfReader("file.pdf")
 ```"
 ````
 
-## Technical notes
+## 技術備註
 
-### YAML frontmatter requirements
+### YAML frontmatter 要求
 
-The SKILL.md frontmatter includes only `name` (64 characters max) and `description` (1024 characters max) fields. See the [Skills overview](/en/docs/agents-and-tools/agent-skills/overview#skill-structure) for complete structure details.
+SKILL.md frontmatter 只能包含 `name`（最多 64 字元）與 `description`（最多 1024 字元）。完整結構細節見 [Skills overview](/en/docs/agents-and-tools/agent-skills/overview#skill-structure)。
 
-### Token budgets
+### Token 預算
 
-Keep SKILL.md body under 500 lines for optimal performance. If your content exceeds this, split it into separate files using the progressive disclosure patterns described earlier. For architectural details, see the [Skills overview](/en/docs/agents-and-tools/agent-skills/overview#how-skills-work).
+SKILL.md 內文保持在 500 行內以確保最佳效能。若超過，請使用上述漸進揭露模式拆成多檔案。架構細節見 [Skills overview](/en/docs/agents-and-tools/agent-skills/overview#how-skills-work)。
 
-## Checklist for effective Skills
+## 有效技能檢查表
 
-Before sharing a Skill, verify:
+在分享技能前，請確認：
 
-### Core quality
+### 核心品質
 
-* [ ] Description is specific and includes key terms
-* [ ] Description includes both what the Skill does and when to use it
-* [ ] SKILL.md body is under 500 lines
-* [ ] Additional details are in separate files (if needed)
-* [ ] No time-sensitive information (or in "old patterns" section)
-* [ ] Consistent terminology throughout
-* [ ] Examples are concrete, not abstract
-* [ ] File references are one level deep
-* [ ] Progressive disclosure used appropriately
-* [ ] Workflows have clear steps
+* [ ] 描述具體且包含關鍵字
+* [ ] 描述同時包含「技能做什麼」與「何時使用」
+* [ ] SKILL.md 內文少於 500 行
+* [ ] 需要時把細節放到獨立檔案
+* [ ] 無時間敏感資訊（或放在「舊模式」段落）
+* [ ] 全文術語一致
+* [ ] 範例具體，不抽象
+* [ ] 檔案引用不超過一層
+* [ ] 漸進揭露使用得當
+* [ ] 工作流程步驟清楚
 
-### Code and scripts
+### 程式碼與腳本
 
-* [ ] Scripts solve problems rather than punt to Claude
-* [ ] Error handling is explicit and helpful
-* [ ] No "voodoo constants" (all values justified)
-* [ ] Required packages listed in instructions and verified as available
-* [ ] Scripts have clear documentation
-* [ ] No Windows-style paths (all forward slashes)
-* [ ] Validation/verification steps for critical operations
-* [ ] Feedback loops included for quality-critical tasks
+* [ ] 腳本能直接解決問題，而不是丟給 Claude
+* [ ] 錯誤處理清楚且有幫助
+* [ ] 無「巫毒常數」（所有值都有理由）
+* [ ] 指示中列出所需套件並確認可用
+* [ ] 腳本有清楚文件
+* [ ] 無 Windows 風格路徑（全為正斜線）
+* [ ] 關鍵操作有驗證/確認步驟
+* [ ] 品質關鍵任務有回饋迴圈
 
-### Testing
+### 測試
 
-* [ ] At least three evaluations created
-* [ ] Tested with Haiku, Sonnet, and Opus
-* [ ] Tested with real usage scenarios
-* [ ] Team feedback incorporated (if applicable)
+* [ ] 至少建立三個評估
+* [ ] 以 Haiku、Sonnet、Opus 測試
+* [ ] 用真實使用情境測試
+* [ ] 納入團隊回饋（若適用）
 
-## Next steps
+## 下一步
 
 <CardGroup cols={2}>
   <Card title="Get started with Agent Skills" icon="rocket" href="/en/docs/agents-and-tools/agent-skills/quickstart">

@@ -1,22 +1,22 @@
-# Visual Brainstorming Companion Implementation Plan
+# 視覺化腦力激盪輔助實作計畫
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **給 agentic workers：** 必須使用 superpowers:executing-plans 來逐步實作此計畫。
 
-**Goal:** Give Claude a browser-based visual companion for brainstorming sessions - show mockups, prototypes, and interactive choices alongside terminal conversation.
+**目標：** 為 Claude 的腦力激盪工作階段提供瀏覽器視覺輔助 — 在終端對話旁展示 mockup、原型與互動式選擇。
 
-**Architecture:** Claude writes HTML to a temp file. A local Node.js server watches that file and serves it with an auto-injected helper library. User interactions flow via WebSocket to server stdout, which Claude sees in background task output.
+**架構：** Claude 將 HTML 寫入暫存檔。本機 Node.js 伺服器監看該檔案並提供內容，同時自動注入 helper 函式庫。使用者互動透過 WebSocket 流向伺服器 stdout，而 Claude 會在背景任務輸出中看到。
 
-**Tech Stack:** Node.js, Express, ws (WebSocket), chokidar (file watching)
+**技術堆疊：** Node.js、Express、ws（WebSocket）、chokidar（檔案監看）
 
 ---
 
-## Task 1: Create the Server Foundation
+## 任務 1：建立伺服器基礎
 
-**Files:**
-- Create: `lib/brainstorm-server/index.js`
-- Create: `lib/brainstorm-server/package.json`
+**檔案：**
+- 新增：`lib/brainstorm-server/index.js`
+- 新增：`lib/brainstorm-server/package.json`
 
-**Step 1: Create package.json**
+**步驟 1：建立 package.json**
 
 ```json
 {
@@ -32,7 +32,7 @@
 }
 ```
 
-**Step 2: Create minimal server that starts**
+**步驟 2：建立可啟動的最小伺服器**
 
 ```javascript
 const express = require('express');
@@ -121,17 +121,17 @@ server.listen(PORT, '127.0.0.1', () => {
 });
 ```
 
-**Step 3: Run npm install**
+**步驟 3：執行 npm install**
 
-Run: `cd lib/brainstorm-server && npm install`
-Expected: Dependencies installed
+執行：`cd lib/brainstorm-server && npm install`
+預期：相依套件已安裝
 
-**Step 4: Test server starts**
+**步驟 4：測試伺服器可啟動**
 
-Run: `cd lib/brainstorm-server && timeout 3 node index.js || true`
-Expected: See JSON with `server-started` and port info
+執行：`cd lib/brainstorm-server && timeout 3 node index.js || true`
+預期：看到包含 `server-started` 與連接埠資訊的 JSON
 
-**Step 5: Commit**
+**步驟 5：提交**
 
 ```bash
 git add lib/brainstorm-server/
@@ -140,12 +140,12 @@ git commit -m "feat: add brainstorm server foundation"
 
 ---
 
-## Task 2: Create the Helper Library
+## 任務 2：建立 Helper 函式庫
 
-**Files:**
-- Create: `lib/brainstorm-server/helper.js`
+**檔案：**
+- 新增：`lib/brainstorm-server/helper.js`
 
-**Step 1: Create helper.js with event auto-capture**
+**步驟 1：建立 helper.js 並自動擷取事件**
 
 ```javascript
 (function() {
@@ -247,12 +247,12 @@ git commit -m "feat: add brainstorm server foundation"
 })();
 ```
 
-**Step 2: Verify helper.js is syntactically valid**
+**步驟 2：驗證 helper.js 語法正確**
 
-Run: `node -c lib/brainstorm-server/helper.js`
-Expected: No syntax errors
+執行：`node -c lib/brainstorm-server/helper.js`
+預期：沒有語法錯誤
 
-**Step 3: Commit**
+**步驟 3：提交**
 
 ```bash
 git add lib/brainstorm-server/helper.js
@@ -261,13 +261,13 @@ git commit -m "feat: add browser helper library for event capture"
 
 ---
 
-## Task 3: Write Tests for the Server
+## 任務 3：為伺服器撰寫測試
 
-**Files:**
-- Create: `tests/brainstorm-server/server.test.js`
-- Create: `tests/brainstorm-server/package.json`
+**檔案：**
+- 新增：`tests/brainstorm-server/server.test.js`
+- 新增：`tests/brainstorm-server/package.json`
 
-**Step 1: Create test package.json**
+**步驟 1：建立測試用 package.json**
 
 ```json
 {
@@ -279,7 +279,7 @@ git commit -m "feat: add browser helper library for event capture"
 }
 ```
 
-**Step 2: Write server tests**
+**步驟 2：撰寫伺服器測試**
 
 ```javascript
 const { spawn } = require('child_process');
@@ -390,12 +390,12 @@ runTests().catch(err => {
 });
 ```
 
-**Step 3: Run tests**
+**步驟 3：執行測試**
 
-Run: `cd tests/brainstorm-server && npm install ws && node server.test.js`
-Expected: All tests pass
+執行：`cd tests/brainstorm-server && npm install ws && node server.test.js`
+預期：所有測試通過
 
-**Step 4: Commit**
+**步驟 4：提交**
 
 ```bash
 git add tests/brainstorm-server/
@@ -404,15 +404,15 @@ git commit -m "test: add brainstorm server integration tests"
 
 ---
 
-## Task 4: Add Visual Companion to Brainstorming Skill
+## 任務 4：將視覺輔助加入 brainstorming 技能
 
-**Files:**
-- Modify: `skills/brainstorming/SKILL.md`
-- Create: `skills/brainstorming/visual-companion.md` (supporting doc)
+**檔案：**
+- 修改：`skills/brainstorming/SKILL.md`
+- 新增：`skills/brainstorming/visual-companion.md`（支援文件）
 
-**Step 1: Create the supporting documentation**
+**步驟 1：建立支援文件**
 
-Create `skills/brainstorming/visual-companion.md`:
+建立 `skills/brainstorming/visual-companion.md`：
 
 ```markdown
 # Visual Companion Reference
@@ -489,9 +489,9 @@ Event types:
 ```
 ```
 
-**Step 2: Add visual companion section to brainstorming skill**
+**步驟 2：在 brainstorming 技能加入視覺輔助段落**
 
-Add after "Key Principles" in `skills/brainstorming/SKILL.md`:
+加入在 `skills/brainstorming/SKILL.md` 的「Key Principles」之後：
 
 ```markdown
 
@@ -516,12 +516,12 @@ The terminal remains the primary conversation interface. The browser is a visual
 **Reference:** See `visual-companion.md` in this skill directory for HTML patterns and API details.
 ```
 
-**Step 3: Verify the edits**
+**步驟 3：確認編輯結果**
 
-Run: `grep -A5 "Visual Companion" skills/brainstorming/SKILL.md`
-Expected: Shows the new section
+執行：`grep -A5 "Visual Companion" skills/brainstorming/SKILL.md`
+預期：顯示新增段落
 
-**Step 4: Commit**
+**步驟 4：提交**
 
 ```bash
 git add skills/brainstorming/
@@ -530,23 +530,23 @@ git commit -m "feat: add visual companion to brainstorming skill"
 
 ---
 
-## Task 5: Add Server to Plugin Ignore (Optional Cleanup)
+## 任務 5：將伺服器加入外掛忽略清單（可選清理）
 
-**Files:**
-- Check if `.gitignore` needs node_modules exclusion for lib/brainstorm-server
+**檔案：**
+- 檢查 `.gitignore` 是否需要排除 lib/brainstorm-server 的 node_modules
 
-**Step 1: Check current gitignore**
+**步驟 1：檢查現有 gitignore**
 
-Run: `cat .gitignore 2>/dev/null || echo "No .gitignore"`
+執行：`cat .gitignore 2>/dev/null || echo "No .gitignore"`
 
-**Step 2: Add node_modules if needed**
+**步驟 2：必要時加入 node_modules**
 
-If not already present, add:
+若尚未存在，加入：
 ```
 lib/brainstorm-server/node_modules/
 ```
 
-**Step 3: Commit if changed**
+**步驟 3：若有修改則提交**
 
 ```bash
 git add .gitignore
@@ -555,17 +555,17 @@ git commit -m "chore: ignore brainstorm-server node_modules"
 
 ---
 
-## Summary
+## 摘要
 
-After completing all tasks:
+完成所有任務後：
 
-1. **Server** at `lib/brainstorm-server/` - Node.js server that watches HTML file and relays events
-2. **Helper library** auto-injected - captures clicks, forms, inputs
-3. **Tests** at `tests/brainstorm-server/` - verifies server behavior
-4. **Brainstorming skill** updated with visual companion section and `visual-companion.md` reference doc
+1. **伺服器** 位於 `lib/brainstorm-server/` - 監看 HTML 檔並轉送事件的 Node.js 伺服器
+2. **Helper 函式庫** 自動注入 - 擷取點擊、表單、輸入
+3. **測試** 位於 `tests/brainstorm-server/` - 驗證伺服器行為
+4. **brainstorming 技能** 已更新加入視覺輔助段落與 `visual-companion.md` 參考文件
 
-**To use:**
-1. Start server as background job: `node lib/brainstorm-server/index.js &`
-2. Tell user to open `http://localhost:3333`
-3. Write HTML to `/tmp/brainstorm/screen.html`
-4. Check task output for user events
+**使用方式：**
+1. 以背景工作啟動伺服器：`node lib/brainstorm-server/index.js &`
+2. 提醒使用者開啟 `http://localhost:3333`
+3. 將 HTML 寫入 `/tmp/brainstorm/screen.html`
+4. 從任務輸出查看使用者事件

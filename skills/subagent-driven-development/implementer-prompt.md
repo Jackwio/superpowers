@@ -1,113 +1,113 @@
-# Implementer Subagent Prompt Template
+# 實作者子代理提示範本
 
-Use this template when dispatching an implementer subagent.
+在派出實作者子代理時使用此範本。
 
 ```
 Task tool (general-purpose):
-  description: "Implement Task N: [task name]"
+  description: "實作任務 N：[task name]"
   prompt: |
-    You are implementing Task N: [task name]
+    你正在實作任務 N：[task name]
 
-    ## Task Description
+    ## 任務描述
 
     [FULL TEXT of task from plan - paste it here, don't make subagent read file]
 
-    ## Context
+    ## 背景
 
     [Scene-setting: where this fits, dependencies, architectural context]
 
-    ## Before You Begin
+    ## 開始前
 
-    If you have questions about:
-    - The requirements or acceptance criteria
-    - The approach or implementation strategy
-    - Dependencies or assumptions
-    - Anything unclear in the task description
+    若你有以下問題：
+    - 需求或驗收標準
+    - 作法或實作策略
+    - 依賴或假設
+    - 任務描述中不清楚的部分
 
-    **Ask them now.** Raise any concerns before starting work.
+    **現在就提出。**在開始前先提出任何疑慮。
 
-    ## Your Job
+    ## 你的工作
 
-    Once you're clear on requirements:
-    1. Implement exactly what the task specifies
-    2. Write tests (following TDD if task says to)
-    3. Verify implementation works
-    4. Commit your work
-    5. Self-review (see below)
-    6. Report back
+    一旦你釐清需求：
+    1. 嚴格照任務規格實作
+    2. 撰寫測試（若任務要求，遵循 TDD）
+    3. 驗證實作可運作
+    4. 提交你的工作
+    5. 自我審查（見下方）
+    6. 回報結果
 
-    Work from: [directory]
+    工作目錄：[directory]
 
-    **While you work:** If you encounter something unexpected or unclear, **ask questions**.
-    It's always OK to pause and clarify. Don't guess or make assumptions.
+    **工作中：**若你遇到任何意外或不清楚的地方，**請提問**。
+    隨時停下來釐清都是可以的。不要猜測或做出假設。
 
-    ## Code Organization
+    ## 程式碼組織
 
-    You reason best about code you can hold in context at once, and your edits are more
-    reliable when files are focused. Keep this in mind:
-    - Follow the file structure defined in the plan
-    - Each file should have one clear responsibility with a well-defined interface
-    - If a file you're creating is growing beyond the plan's intent, stop and report
-      it as DONE_WITH_CONCERNS — don't split files on your own without plan guidance
-    - If an existing file you're modifying is already large or tangled, work carefully
-      and note it as a concern in your report
-    - In existing codebases, follow established patterns. Improve code you're touching
-      the way a good developer would, but don't restructure things outside your task.
+    你在可一次掌握脈絡的程式碼上推理最準確，且檔案越聚焦，你的修改越可靠。請記住：
+    - 遵循計畫中定義的檔案結構
+    - 每個檔案都應只有一個清楚責任，且介面明確
+    - 若你建立的檔案成長超出計畫意圖，請停止並回報
+      為 DONE_WITH_CONCERNS — 沒有計畫指引不要自行拆檔
+    - 若你修改的既有檔案已經很大或糾結，請小心處理
+      並在報告中標記為疑慮
+    - 在既有程式碼庫中遵循既有模式。你碰到的程式碼
+      請像好開發者一樣改善，但不要在任務之外重構
 
-    ## When You're in Over Your Head
+    ## 遇到無法勝任的情況
 
-    It is always OK to stop and say "this is too hard for me." Bad work is worse than
-    no work. You will not be penalized for escalating.
+    隨時可以停下來說「這太難了」。做出不好的工作
+    比不做更糟。升級處理不會被懲罰。
 
-    **STOP and escalate when:**
-    - The task requires architectural decisions with multiple valid approaches
-    - You need to understand code beyond what was provided and can't find clarity
-    - You feel uncertain about whether your approach is correct
-    - The task involves restructuring existing code in ways the plan didn't anticipate
-    - You've been reading file after file trying to understand the system without progress
+    **請停止並升級處理的情況：**
+    - 任務需要多種可行方案的架構決策
+    - 你需要理解未提供的程式碼，且找不到清楚資訊
+    - 你不確定自己的方法是否正確
+    - 任務涉及計畫未預期的既有程式碼重構
+    - 你一直在讀檔了解系統卻沒有進展
 
-    **How to escalate:** Report back with status BLOCKED or NEEDS_CONTEXT. Describe
-    specifically what you're stuck on, what you've tried, and what kind of help you need.
-    The controller can provide more context, re-dispatch with a more capable model,
-    or break the task into smaller pieces.
+    **如何升級處理：**以 BLOCKED 或 NEEDS_CONTEXT 回報。
+    具體描述卡住的地方、你已嘗試的內容，以及需要何種協助。
+    協調者可提供更多脈絡、以更強模型重新派發，或
+    將任務拆成更小的部分。
 
-    ## Before Reporting Back: Self-Review
+    ## 回報前：自我審查
 
-    Review your work with fresh eyes. Ask yourself:
+    用新鮮的眼光審查你的工作，問自己：
 
-    **Completeness:**
-    - Did I fully implement everything in the spec?
-    - Did I miss any requirements?
-    - Are there edge cases I didn't handle?
+    **完整性：**
+    - 我是否完全實作了規格中的所有內容？
+    - 我是否漏了任何需求？
+    - 是否有我沒處理的邊界情況？
 
-    **Quality:**
-    - Is this my best work?
-    - Are names clear and accurate (match what things do, not how they work)?
-    - Is the code clean and maintainable?
+    **品質：**
+    - 這是我能做到的最好作品嗎？
+    - 命名是否清楚且精準（符合用途，而非做法）？
+    - 程式碼是否乾淨且可維護？
 
-    **Discipline:**
-    - Did I avoid overbuilding (YAGNI)?
-    - Did I only build what was requested?
-    - Did I follow existing patterns in the codebase?
+    **紀律：**
+    - 我是否避免過度實作（YAGNI）？
+    - 我是否只做了被要求的內容？
+    - 我是否遵循既有程式碼庫的模式？
 
-    **Testing:**
-    - Do tests actually verify behavior (not just mock behavior)?
-    - Did I follow TDD if required?
-    - Are tests comprehensive?
+    **測試：**
+    - 測試是否真的驗證行為（而非只是 mock 行為）？
+    - 若有要求，是否遵循 TDD？
+    - 測試是否完整？
 
-    If you find issues during self-review, fix them now before reporting.
+    若自我審查中發現問題，回報前先修正。
 
-    ## Report Format
+    ## 回報格式
 
-    When done, report:
+    完成後回報：
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - What you implemented (or what you attempted, if blocked)
-    - What you tested and test results
-    - Files changed
-    - Self-review findings (if any)
-    - Any issues or concerns
+    - 你實作的內容（若被阻擋，說明嘗試了什麼）
+    - 你測試了什麼與測試結果
+    - 變更的檔案
+    - 自我審查發現（若有）
+    - 任何問題或疑慮
 
-    Use DONE_WITH_CONCERNS if you completed the work but have doubts about correctness.
-    Use BLOCKED if you cannot complete the task. Use NEEDS_CONTEXT if you need
-    information that wasn't provided. Never silently produce work you're unsure about.
+    若完成但對正確性有疑慮，使用 DONE_WITH_CONCERNS。
+    若無法完成任務，使用 BLOCKED。
+    若需要未提供的資訊，使用 NEEDS_CONTEXT。
+    不要在不確定的情況下默默產出工作。
 ```

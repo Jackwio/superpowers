@@ -1,38 +1,38 @@
-# Superpowers for Codex
+# Codex 版 Superpowers
 
-Guide for using Superpowers with OpenAI Codex via native skill discovery.
+透過原生技能探索使用 Superpowers 與 OpenAI Codex 的指南。
 
-## Quick Install
+## 快速安裝
 
-Tell Codex:
+告訴 Codex：
 
 ```
 Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.codex/INSTALL.md
 ```
 
-## Manual Installation
+## 手動安裝
 
-### Prerequisites
+### 先決條件
 
 - OpenAI Codex CLI
 - Git
 
-### Steps
+### 步驟
 
-1. Clone the repo:
+1. 複製儲存庫：
    ```bash
    git clone https://github.com/obra/superpowers.git ~/.codex/superpowers
    ```
 
-2. Create the skills symlink:
+2. 建立技能符號連結：
    ```bash
    mkdir -p ~/.agents/skills
    ln -s ~/.codex/superpowers/skills ~/.agents/skills/superpowers
    ```
 
-3. Restart Codex.
+3. 重新啟動 Codex。
 
-4. **For subagent skills** (optional): Skills like `dispatching-parallel-agents` and `subagent-driven-development` require Codex's collab feature. Add to your Codex config:
+4. **子代理技能**（可選）：像 `dispatching-parallel-agents` 與 `subagent-driven-development` 這類技能需要 Codex 的 collab 功能。請在 Codex 設定中加入：
    ```toml
    [features]
    collab = true
@@ -40,39 +40,39 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 
 ### Windows
 
-Use a junction instead of a symlink (works without Developer Mode):
+使用 junction 取代符號連結（不需要開發者模式）：
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.agents\skills"
 cmd /c mklink /J "$env:USERPROFILE\.agents\skills\superpowers" "$env:USERPROFILE\.codex\superpowers\skills"
 ```
 
-## How It Works
+## 如何運作
 
-Codex has native skill discovery — it scans `~/.agents/skills/` at startup, parses SKILL.md frontmatter, and loads skills on demand. Superpowers skills are made visible through a single symlink:
+Codex 具備原生技能探索能力 — 它在啟動時掃描 `~/.agents/skills/`，解析 SKILL.md 的 frontmatter，並按需載入技能。Superpowers 的技能會透過單一符號連結被看見：
 
 ```
 ~/.agents/skills/superpowers/ → ~/.codex/superpowers/skills/
 ```
 
-The `using-superpowers` skill is discovered automatically and enforces skill usage discipline — no additional configuration needed.
+`using-superpowers` 技能會自動被發現並強制技能使用紀律 — 不需要額外設定。
 
-## Usage
+## 使用方式
 
-Skills are discovered automatically. Codex activates them when:
-- You mention a skill by name (e.g., "use brainstorming")
-- The task matches a skill's description
-- The `using-superpowers` skill directs Codex to use one
+技能會自動被發現。Codex 在以下情況會啟用它們：
+- 你提到技能名稱（例如「use brainstorming」）
+- 任務符合技能的描述
+- `using-superpowers` 技能指示 Codex 使用某個技能
 
-### Personal Skills
+### 個人技能
 
-Create your own skills in `~/.agents/skills/`:
+在 `~/.agents/skills/` 中建立你自己的技能：
 
 ```bash
 mkdir -p ~/.agents/skills/my-skill
 ```
 
-Create `~/.agents/skills/my-skill/SKILL.md`:
+建立 `~/.agents/skills/my-skill/SKILL.md`：
 
 ```markdown
 ---
@@ -85,42 +85,42 @@ description: Use when [condition] - [what it does]
 [Your skill content here]
 ```
 
-The `description` field is how Codex decides when to activate a skill automatically — write it as a clear trigger condition.
+`description` 欄位是 Codex 用來判斷何時自動啟用技能的依據 — 請把它寫成清楚的觸發條件。
 
-## Updating
+## 更新
 
 ```bash
 cd ~/.codex/superpowers && git pull
 ```
 
-Skills update instantly through the symlink.
+技能會透過符號連結即時更新。
 
-## Uninstalling
+## 解除安裝
 
 ```bash
 rm ~/.agents/skills/superpowers
 ```
 
-**Windows (PowerShell):**
+**Windows（PowerShell）：**
 ```powershell
 Remove-Item "$env:USERPROFILE\.agents\skills\superpowers"
 ```
 
-Optionally delete the clone: `rm -rf ~/.codex/superpowers` (Windows: `Remove-Item -Recurse -Force "$env:USERPROFILE\.codex\superpowers"`).
+如有需要，可刪除複本：`rm -rf ~/.codex/superpowers`（Windows：`Remove-Item -Recurse -Force "$env:USERPROFILE\.codex\superpowers"`）。
 
-## Troubleshooting
+## 疑難排解
 
-### Skills not showing up
+### 技能沒有出現
 
-1. Verify the symlink: `ls -la ~/.agents/skills/superpowers`
-2. Check skills exist: `ls ~/.codex/superpowers/skills`
-3. Restart Codex — skills are discovered at startup
+1. 驗證符號連結：`ls -la ~/.agents/skills/superpowers`
+2. 檢查技能是否存在：`ls ~/.codex/superpowers/skills`
+3. 重新啟動 Codex — 技能是在啟動時被發現的
 
-### Windows junction issues
+### Windows junction 問題
 
-Junctions normally work without special permissions. If creation fails, try running PowerShell as administrator.
+Junction 通常不需要特殊權限即可運作。若建立失敗，請嘗試以系統管理員身分執行 PowerShell。
 
-## Getting Help
+## 取得協助
 
-- Report issues: https://github.com/obra/superpowers/issues
-- Main documentation: https://github.com/obra/superpowers
+- 回報問題：https://github.com/obra/superpowers/issues
+- 主要文件：https://github.com/obra/superpowers

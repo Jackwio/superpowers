@@ -1,50 +1,50 @@
-# Spec Document Reviewer Prompt Template
+# 規格文件審查提示範本
 
-Use this template when dispatching a spec document reviewer subagent.
+在派出規格文件審查子代理時使用此範本。
 
-**Purpose:** Verify the spec is complete, consistent, and ready for implementation planning.
+**目的：**確認規格完整、一致，且已準備好進入實作規劃。
 
-**Dispatch after:** Spec document is written to docs/superpowers/specs/
+**派出時機：**規格文件已寫入 docs/superpowers/specs/
 
 ```
 Task tool (general-purpose):
-  description: "Review spec document"
+  description: "審查規格文件"
   prompt: |
-    You are a spec document reviewer. Verify this spec is complete and ready for planning.
+    你是規格文件審查者。請確認此規格完整並適合進入規劃。
 
-    **Spec to review:** [SPEC_FILE_PATH]
+    **要審查的規格：** [SPEC_FILE_PATH]
 
-    ## What to Check
+    ## 檢查重點
 
-    | Category | What to Look For |
+    | 類別 | 要注意什麼 |
     |----------|------------------|
-    | Completeness | TODOs, placeholders, "TBD", incomplete sections |
-    | Coverage | Missing error handling, edge cases, integration points |
-    | Consistency | Internal contradictions, conflicting requirements |
-    | Clarity | Ambiguous requirements |
-    | YAGNI | Unrequested features, over-engineering |
-    | Scope | Focused enough for a single plan — not covering multiple independent subsystems |
-    | Architecture | Units with clear boundaries, well-defined interfaces, independently understandable and testable |
+    | 完整性 | TODO、占位文字、「TBD」、未完成段落 |
+    | 覆蓋性 | 遺漏的錯誤處理、邊界情況、整合點 |
+    | 一致性 | 內部矛盾、相互衝突的需求 |
+    | 清晰度 | 模稜兩可的需求 |
+    | YAGNI | 未被需求要求的功能、過度工程 |
+    | 範圍 | 是否足夠聚焦於單一計畫 — 不應涵蓋多個彼此獨立的子系統 |
+    | 架構 | 單元邊界清楚、介面明確、可獨立理解與測試 |
 
     ## CRITICAL
 
-    Look especially hard for:
-    - Any TODO markers or placeholder text
-    - Sections saying "to be defined later" or "will spec when X is done"
-    - Sections noticeably less detailed than others
-    - Units that lack clear boundaries or interfaces — can you understand what each unit does without reading its internals?
+    特別仔細檢查以下事項：
+    - 任何 TODO 標記或占位文字
+    - 任何寫著「之後再定義」或「等 X 做完再寫規格」的段落
+    - 明顯比其他段落更不具體的內容
+    - 缺少清楚邊界或介面的單元 — 你能不看內部細節就理解每個單元做什麼嗎？
 
-    ## Output Format
+    ## 輸出格式
 
-    ## Spec Review
+    ## 規格審查
 
-    **Status:** ✅ Approved | ❌ Issues Found
+    **狀態：** ✅ 通過 | ❌ 發現問題
 
-    **Issues (if any):**
-    - [Section X]: [specific issue] - [why it matters]
+    **問題（若有）：**
+    - [段落 X]：[具體問題] - [為何重要]
 
-    **Recommendations (advisory):**
-    - [suggestions that don't block approval]
+    **建議（非阻擋）：**
+    - [不影響核准的建議]
 ```
 
-**Reviewer returns:** Status, Issues (if any), Recommendations
+**審查者回傳：**狀態、問題（若有）、建議

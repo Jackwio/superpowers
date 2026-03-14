@@ -1,69 +1,69 @@
 ---
 name: dispatching-parallel-agents
-description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
+description: 當你面對 2 個以上可獨立處理、沒有共享狀態或序列相依的任務時使用
 ---
 
-# Dispatching Parallel Agents
+# 派發平行代理
 
-## Overview
+## 概覽
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+你將任務委派給具專長的代理，並給予隔離脈絡。透過精準撰寫指令與背景，你能確保他們保持專注並完成任務。他們**不應**繼承你的會話脈絡或歷史 — 你要明確建構他們所需的資訊。這同時也能保留你自己的脈絡，以便做協調工作。
 
-When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
+當你有多個不相關的失敗（不同測試檔、不同子系統、不同 bug），逐一調查會浪費時間。每個調查互不相依，可平行進行。
 
-**Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
+**核心原則：**每個獨立問題領域派一個代理，讓他們並行工作。
 
-## When to Use
+## 何時使用
 
 ```dot
 digraph when_to_use {
-    "Multiple failures?" [shape=diamond];
-    "Are they independent?" [shape=diamond];
-    "Single agent investigates all" [shape=box];
-    "One agent per problem domain" [shape=box];
-    "Can they work in parallel?" [shape=diamond];
-    "Sequential agents" [shape=box];
-    "Parallel dispatch" [shape=box];
+    "有多個失敗？" [shape=diamond];
+    "它們彼此獨立？" [shape=diamond];
+    "單一代理調查全部" [shape=box];
+    "每個問題領域一個代理" [shape=box];
+    "可平行工作？" [shape=diamond];
+    "序列派發" [shape=box];
+    "平行派發" [shape=box];
 
-    "Multiple failures?" -> "Are they independent?" [label="yes"];
-    "Are they independent?" -> "Single agent investigates all" [label="no - related"];
-    "Are they independent?" -> "Can they work in parallel?" [label="yes"];
-    "Can they work in parallel?" -> "Parallel dispatch" [label="yes"];
-    "Can they work in parallel?" -> "Sequential agents" [label="no - shared state"];
+    "有多個失敗？" -> "它們彼此獨立？" [label="是"];
+    "它們彼此獨立？" -> "單一代理調查全部" [label="否 - 相關"];
+    "它們彼此獨立？" -> "可平行工作？" [label="是"];
+    "可平行工作？" -> "平行派發" [label="是"];
+    "可平行工作？" -> "序列派發" [label="否 - 共享狀態"];
 }
 ```
 
-**Use when:**
-- 3+ test files failing with different root causes
-- Multiple subsystems broken independently
-- Each problem can be understood without context from others
-- No shared state between investigations
+**使用時機：**
+- 3 個以上測試檔失敗且根因不同
+- 多個子系統各自壞掉
+- 每個問題可在不需要其他脈絡下理解
+- 調查之間沒有共享狀態
 
-**Don't use when:**
-- Failures are related (fix one might fix others)
-- Need to understand full system state
-- Agents would interfere with each other
+**不要使用：**
+- 失敗彼此相關（修一個可能會修好其他）
+- 需要理解完整系統狀態
+- 代理會互相干擾
 
-## The Pattern
+## 模式
 
-### 1. Identify Independent Domains
+### 1. 識別獨立領域
 
-Group failures by what's broken:
-- File A tests: Tool approval flow
-- File B tests: Batch completion behavior
-- File C tests: Abort functionality
+依故障類型分組：
+- 檔案 A 測試：工具核准流程
+- 檔案 B 測試：批次完成行為
+- 檔案 C 測試：中止功能
 
-Each domain is independent - fixing tool approval doesn't affect abort tests.
+每個領域彼此獨立 — 修工具核准不會影響中止測試。
 
-### 2. Create Focused Agent Tasks
+### 2. 建立聚焦的代理任務
 
-Each agent gets:
-- **Specific scope:** One test file or subsystem
-- **Clear goal:** Make these tests pass
-- **Constraints:** Don't change other code
-- **Expected output:** Summary of what you found and fixed
+每個代理拿到：
+- **明確範圍：**一個測試檔或子系統
+- **清楚目標：**讓這些測試通過
+- **限制：**不要改動其他程式碼
+- **預期輸出：**你發現與修正的摘要
 
-### 3. Dispatch in Parallel
+### 3. 平行派發
 
 ```typescript
 // In Claude Code / AI environment
@@ -73,20 +73,20 @@ Task("Fix tool-approval-race-conditions.test.ts failures")
 // All three run concurrently
 ```
 
-### 4. Review and Integrate
+### 4. 審查並整合
 
-When agents return:
-- Read each summary
-- Verify fixes don't conflict
-- Run full test suite
-- Integrate all changes
+代理回來後：
+- 讀取每個摘要
+- 確認修正不衝突
+- 跑完整測試
+- 整合所有變更
 
-## Agent Prompt Structure
+## 代理提示結構
 
-Good agent prompts are:
-1. **Focused** - One clear problem domain
-2. **Self-contained** - All context needed to understand the problem
-3. **Specific about output** - What should the agent return?
+好的代理提示具備：
+1. **聚焦** — 一個清楚的問題領域
+2. **自足** — 理解問題所需的所有背景
+3. **明確輸出** — 代理應回傳什麼
 
 ```markdown
 Fix the 3 failing tests in src/agents/agent-tool-abort.test.ts:
@@ -109,74 +109,74 @@ Do NOT just increase timeouts - find the real issue.
 Return: Summary of what you found and what you fixed.
 ```
 
-## Common Mistakes
+## 常見錯誤
 
-**❌ Too broad:** "Fix all the tests" - agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" - focused scope
+**❌ 太寬泛：**「修所有測試」— 代理會迷失
+**✅ 具體：**「修 agent-tool-abort.test.ts」— 範圍明確
 
-**❌ No context:** "Fix the race condition" - agent doesn't know where
-**✅ Context:** Paste the error messages and test names
+**❌ 無脈絡：**「修競態條件」— 代理不知道在哪裡
+**✅ 有脈絡：**貼上錯誤訊息與測試名稱
 
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
+**❌ 無限制：**代理可能把整個系統都重構
+**✅ 有限制：**「不要改 production code」或「只修測試」
 
-**❌ Vague output:** "Fix it" - you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
+**❌ 輸出模糊：**「修好它」— 你不知道改了什麼
+**✅ 明確：**「回報根因與變更摘要」
 
-## When NOT to Use
+## 何時不要用
 
-**Related failures:** Fixing one might fix others - investigate together first
-**Need full context:** Understanding requires seeing entire system
-**Exploratory debugging:** You don't know what's broken yet
-**Shared state:** Agents would interfere (editing same files, using same resources)
+**失敗相關：**修一個可能會修好其他 — 先一起調查
+**需要完整脈絡：**必須看整個系統才能理解
+**探索性除錯：**你還不清楚壞了什麼
+**共享狀態：**代理會互相干擾（編同檔案、用同資源）
 
-## Real Example from Session
+## 會話中的真實例子
 
-**Scenario:** 6 test failures across 3 files after major refactoring
+**情境：**重大重構後，3 個檔案共 6 個測試失敗
 
-**Failures:**
-- agent-tool-abort.test.ts: 3 failures (timing issues)
-- batch-completion-behavior.test.ts: 2 failures (tools not executing)
-- tool-approval-race-conditions.test.ts: 1 failure (execution count = 0)
+**失敗：**
+- agent-tool-abort.test.ts：3 個失敗（時間/競態）
+- batch-completion-behavior.test.ts：2 個失敗（工具未執行）
+- tool-approval-race-conditions.test.ts：1 個失敗（執行次數 = 0）
 
-**Decision:** Independent domains - abort logic separate from batch completion separate from race conditions
+**決策：**獨立領域 — 中止邏輯、批次完成、競態條件彼此獨立
 
-**Dispatch:**
+**派發：**
 ```
 Agent 1 → Fix agent-tool-abort.test.ts
 Agent 2 → Fix batch-completion-behavior.test.ts
 Agent 3 → Fix tool-approval-race-conditions.test.ts
 ```
 
-**Results:**
-- Agent 1: Replaced timeouts with event-based waiting
-- Agent 2: Fixed event structure bug (threadId in wrong place)
-- Agent 3: Added wait for async tool execution to complete
+**結果：**
+- Agent 1：用事件等待取代 timeout
+- Agent 2：修正事件結構 bug（threadId 放錯位置）
+- Agent 3：新增等待非同步工具執行完成
 
-**Integration:** All fixes independent, no conflicts, full suite green
+**整合：**修正彼此獨立、無衝突、全套測試通過
 
-**Time saved:** 3 problems solved in parallel vs sequentially
+**節省時間：**3 個問題平行解決，對比逐一處理
 
-## Key Benefits
+## 主要效益
 
-1. **Parallelization** - Multiple investigations happen simultaneously
-2. **Focus** - Each agent has narrow scope, less context to track
-3. **Independence** - Agents don't interfere with each other
-4. **Speed** - 3 problems solved in time of 1
+1. **平行化** — 多個調查同時進行
+2. **聚焦** — 每個代理範圍窄，脈絡較少
+3. **獨立性** — 代理互不干擾
+4. **速度** — 以 1 的時間完成 3
 
-## Verification
+## 驗證
 
-After agents return:
-1. **Review each summary** - Understand what changed
-2. **Check for conflicts** - Did agents edit same code?
-3. **Run full suite** - Verify all fixes work together
-4. **Spot check** - Agents can make systematic errors
+代理回來後：
+1. **審查每份摘要** — 理解改了什麼
+2. **檢查衝突** — 是否有代理改同一段程式碼
+3. **執行完整測試** — 確認所有修正能一起運作
+4. **抽樣檢查** — 代理可能犯系統性錯誤
 
-## Real-World Impact
+## 真實影響
 
-From debugging session (2025-10-03):
-- 6 failures across 3 files
-- 3 agents dispatched in parallel
-- All investigations completed concurrently
-- All fixes integrated successfully
-- Zero conflicts between agent changes
+來自除錯會話（2025-10-03）：
+- 3 個檔案共 6 個失敗
+- 3 個代理平行派發
+- 全部調查同步完成
+- 全部修正成功整合
+- 代理變更之間零衝突

@@ -1,14 +1,14 @@
-# Academic Test: Systematic Debugging Skill
+# 學術測驗：系統化除錯技能
 
-You have access to the systematic debugging skill at skills/debugging/systematic-debugging
+你可以使用位於 skills/debugging/systematic-debugging 的系統化除錯技能。
 
-Read the skill and answer these questions based SOLELY on what the skill says:
+閱讀該技能，並**僅**依技能內容回答以下問題：
 
-1. What are the four phases of systematic debugging?
-2. What must you do BEFORE attempting any fix?
-3. In Phase 3, what should you do if your first hypothesis doesn't work?
-4. What does the skill say about fixing multiple things at once?
-5. What should you do if you don't fully understand the issue?
-6. Is it ever acceptable to skip the process for simple bugs?
+1. 系統化除錯的四個階段是什麼？
+2. 在嘗試任何修正之前，必須先做什麼？
+3. 在第 3 階段，若第一個假設無效，你應該怎麼做？
+4. 技能怎麼說一次修多個問題？
+5. 若你尚未完全理解問題，應該怎麼做？
+6. 對於簡單 bug，可以跳過流程嗎？
 
-Return your answers with direct quotes from the skill where applicable.
+請在可行時用技能中的直接引文回覆答案。

@@ -1,33 +1,33 @@
-# Gemini CLI Tool Mapping
+# Gemini CLI 工具對應
 
-Skills use Claude Code tool names. When you encounter these in a skill, use your platform equivalent:
+技能使用 Claude Code 的工具名稱。當你在技能中看到它們時，請使用你平台上的對應工具：
 
-| Skill references | Gemini CLI equivalent |
+| 技能引用 | Gemini CLI 對應 |
 |-----------------|----------------------|
-| `Read` (file reading) | `read_file` |
-| `Write` (file creation) | `write_file` |
-| `Edit` (file editing) | `replace` |
-| `Bash` (run commands) | `run_shell_command` |
-| `Grep` (search file content) | `grep_search` |
-| `Glob` (search files by name) | `glob` |
-| `TodoWrite` (task tracking) | `write_todos` |
-| `Skill` tool (invoke a skill) | `activate_skill` |
+| `Read`（讀檔） | `read_file` |
+| `Write`（建立檔案） | `write_file` |
+| `Edit`（編輯檔案） | `replace` |
+| `Bash`（執行指令） | `run_shell_command` |
+| `Grep`（搜尋檔案內容） | `grep_search` |
+| `Glob`（依名稱搜尋檔案） | `glob` |
+| `TodoWrite`（任務追蹤） | `write_todos` |
+| `Skill` 工具（呼叫技能） | `activate_skill` |
 | `WebSearch` | `google_web_search` |
 | `WebFetch` | `web_fetch` |
-| `Task` tool (dispatch subagent) | No equivalent — Gemini CLI does not support subagents |
+| `Task` 工具（派出子代理） | 無對應 — Gemini CLI 不支援子代理 |
 
-## No subagent support
+## 不支援子代理
 
-Gemini CLI has no equivalent to Claude Code's `Task` tool. Skills that rely on subagent dispatch (`subagent-driven-development`, `dispatching-parallel-agents`) will fall back to single-session execution via `executing-plans`.
+Gemini CLI 沒有 Claude Code 的 `Task` 工具對應。依賴子代理派發的技能（`subagent-driven-development`、`dispatching-parallel-agents`）會改用 `executing-plans` 以單一會話執行。
 
-## Additional Gemini CLI tools
+## Gemini CLI 其他工具
 
-These tools are available in Gemini CLI but have no Claude Code equivalent:
+以下工具在 Gemini CLI 可用，但 Claude Code 沒有對應：
 
-| Tool | Purpose |
+| 工具 | 用途 |
 |------|---------|
-| `list_directory` | List files and subdirectories |
-| `save_memory` | Persist facts to GEMINI.md across sessions |
-| `ask_user` | Request structured input from the user |
-| `tracker_create_task` | Rich task management (create, update, list, visualize) |
-| `enter_plan_mode` / `exit_plan_mode` | Switch to read-only research mode before making changes |
+| `list_directory` | 列出檔案與子目錄 |
+| `save_memory` | 跨會話將事實保存到 GEMINI.md |
+| `ask_user` | 向使用者請求結構化輸入 |
+| `tracker_create_task` | 完整任務管理（建立、更新、列出、視覺化） |
+| `enter_plan_mode` / `exit_plan_mode` | 切換到只讀研究模式後再修改 |

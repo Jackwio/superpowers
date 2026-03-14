@@ -1,52 +1,52 @@
-# Plan Document Reviewer Prompt Template
+# 計畫文件審查提示範本
 
-Use this template when dispatching a plan document reviewer subagent.
+在派出計畫文件審查子代理時使用此範本。
 
-**Purpose:** Verify the plan chunk is complete, matches the spec, and has proper task decomposition.
+**目的：**確認計畫區塊完整、符合規格，且任務拆解恰當。
 
-**Dispatch after:** Each plan chunk is written
+**派出時機：**每個計畫區塊寫完後
 
 ```
 Task tool (general-purpose):
-  description: "Review plan chunk N"
+  description: "審查計畫區塊 N"
   prompt: |
-    You are a plan document reviewer. Verify this plan chunk is complete and ready for implementation.
+    你是計畫文件審查者。請確認此計畫區塊完整並可進入實作。
 
-    **Plan chunk to review:** [PLAN_FILE_PATH] - Chunk N only
-    **Spec for reference:** [SPEC_FILE_PATH]
+    **要審查的計畫區塊：** [PLAN_FILE_PATH] - 只看區塊 N
+    **參考規格：** [SPEC_FILE_PATH]
 
-    ## What to Check
+    ## 檢查重點
 
-    | Category | What to Look For |
+    | 類別 | 要注意什麼 |
     |----------|------------------|
-    | Completeness | TODOs, placeholders, incomplete tasks, missing steps |
-    | Spec Alignment | Chunk covers relevant spec requirements, no scope creep |
-    | Task Decomposition | Tasks atomic, clear boundaries, steps actionable |
-    | File Structure | Files have clear single responsibilities, split by responsibility not layer |
-    | File Size | Would any new or modified file likely grow large enough to be hard to reason about as a whole? |
-    | Task Syntax | Checkbox syntax (`- [ ]`) on steps for tracking |
-    | Chunk Size | Each chunk under 1000 lines |
+    | 完整性 | TODO、占位文字、未完成任務、缺少步驟 |
+    | 規格對齊 | 區塊涵蓋相關規格需求，無範圍膨脹 |
+    | 任務拆解 | 任務具原子性、邊界清楚、步驟可執行 |
+    | 檔案結構 | 檔案只有單一責任，依責任拆分而非層級 |
+    | 檔案大小 | 是否有新建或修改檔案可能變得過大而難以整體推理？ |
+    | 任務語法 | 步驟使用勾選框語法（`- [ ]`）以利追蹤 |
+    | 區塊大小 | 每個區塊小於 1000 行 |
 
     ## CRITICAL
 
-    Look especially hard for:
-    - Any TODO markers or placeholder text
-    - Steps that say "similar to X" without actual content
-    - Incomplete task definitions
-    - Missing verification steps or expected outputs
-    - Files planned to hold multiple responsibilities or likely to grow unwieldy
+    特別仔細檢查以下事項：
+    - 任何 TODO 標記或占位文字
+    - 只寫「類似 X」但沒有實際內容的步驟
+    - 不完整的任務定義
+    - 缺少驗證步驟或預期輸出
+    - 計畫中的檔案同時承擔多重責任或可能變得難以維護
 
-    ## Output Format
+    ## 輸出格式
 
-    ## Plan Review - Chunk N
+    ## 計畫審查 - 區塊 N
 
-    **Status:** Approved | Issues Found
+    **狀態：** 通過 | 發現問題
 
-    **Issues (if any):**
-    - [Task X, Step Y]: [specific issue] - [why it matters]
+    **問題（若有）：**
+    - [任務 X，步驟 Y]：[具體問題] - [為何重要]
 
-    **Recommendations (advisory):**
-    - [suggestions that don't block approval]
+    **建議（非阻擋）：**
+    - [不影響核准的建議]
 ```
 
-**Reviewer returns:** Status, Issues (if any), Recommendations
+**審查者回傳：**狀態、問題（若有）、建議

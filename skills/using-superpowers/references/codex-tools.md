@@ -1,25 +1,25 @@
-# Codex Tool Mapping
+# Codex 工具對應
 
-Skills use Claude Code tool names. When you encounter these in a skill, use your platform equivalent:
+技能使用 Claude Code 的工具名稱。當你在技能中看到它們時，請使用你平台上的對應工具：
 
-| Skill references | Codex equivalent |
+| 技能引用 | Codex 對應 |
 |-----------------|------------------|
-| `Task` tool (dispatch subagent) | `spawn_agent` |
-| Multiple `Task` calls (parallel) | Multiple `spawn_agent` calls |
-| Task returns result | `wait` |
-| Task completes automatically | `close_agent` to free slot |
-| `TodoWrite` (task tracking) | `update_plan` |
-| `Skill` tool (invoke a skill) | Skills load natively — just follow the instructions |
-| `Read`, `Write`, `Edit` (files) | Use your native file tools |
-| `Bash` (run commands) | Use your native shell tools |
+| `Task` 工具（派出子代理） | `spawn_agent` |
+| 多次 `Task` 呼叫（平行） | 多次 `spawn_agent` 呼叫 |
+| Task 回傳結果 | `wait` |
+| Task 自動完成 | 使用 `close_agent` 釋放插槽 |
+| `TodoWrite`（任務追蹤） | `update_plan` |
+| `Skill` 工具（呼叫技能） | 技能原生載入 — 直接遵循指示 |
+| `Read`、`Write`、`Edit`（檔案） | 使用原生檔案工具 |
+| `Bash`（執行指令） | 使用原生 shell 工具 |
 
-## Subagent dispatch requires collab
+## 子代理派發需要啟用 collab
 
-Add to your Codex config (`~/.codex/config.toml`):
+在你的 Codex 設定（`~/.codex/config.toml`）中加入：
 
 ```toml
 [features]
 collab = true
 ```
 
-This enables `spawn_agent`, `wait`, and `close_agent` for skills like `dispatching-parallel-agents` and `subagent-driven-development`.
+這會啟用 `spawn_agent`、`wait`、`close_agent`，以供 `dispatching-parallel-agents` 與 `subagent-driven-development` 等技能使用。
